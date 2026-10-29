@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sunwicck Business Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f5f6f8;--card:#fff;--primary:#f47c20;--primary-dark:#d96510;--primary-light:#fff3e8;
+  --text:#111827;--text2:#5b6472;--text3:#9ca3af;--border:#e5e7eb;--border2:#d1d5db;
+  --success:#059669;--success-bg:#ecfdf5;--warning:#b45309;--warning-bg:#fffbeb;
+  --danger:#dc2626;--danger-bg:#fef2f2;--info:#2563eb;--info-bg:#eff6ff;
+  --radius:14px;--radius-sm:10px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.45;max-width:480px;margin:0 auto;position:relative}
+#root{height:100%;display:flex;flex-direction:column;overflow:hidden}
+.app-shell{display:flex;flex-direction:column;height:100%}
+.main{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.screen{flex:1;min-height:0;overflow-y:auto;padding:16px 16px 100px;-webkit-overflow-scrolling:touch}
+/* Nav */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 2px 8px;cursor:pointer;color:var(--text2);border:none;background:none;font-size:12px;font-weight:600;gap:3px}
+.nav-item.active{color:var(--primary)}
+.nav-icon{font-size:24px;line-height:1}
+/* Cards */
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px}
+.card-sm{background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);padding:12px;margin-bottom:8px}
+h1{font-size:24px;font-weight:800;margin-bottom:2px}
+h2{font-size:20px;font-weight:700;margin-bottom:12px}
+h3{font-size:16px;font-weight:700}
+.section-label{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:22px 0 8px}
+.muted{color:var(--text2);font-size:14px}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;border:none;touch-action:manipulation;min-height:50px}
+.btn:active{opacity:.8}
+.btn:disabled{opacity:.45}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-secondary{background:var(--primary-light);color:var(--primary-dark)}
+.btn-outline{background:var(--card);border:1.5px solid var(--border2);color:var(--text)}
+.btn-danger{background:var(--danger-bg);color:var(--danger)}
+.btn-sm{padding:8px 14px;font-size:14px;min-height:40px}
+.btn-full{width:100%}
+.btn-row{display:flex;gap:8px;margin-top:16px}
+/* Big log buttons */
+.big-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.big-btn{border:none;border-radius:18px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#fff;font-size:18px;font-weight:800;cursor:pointer;padding:10px;text-align:center;line-height:1.2}
+.big-btn:active{transform:scale(.97)}
+.big-icon{font-size:34px;line-height:1}
+.small-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.small-btn{border:1.5px solid var(--border2);background:var(--card);border-radius:12px;padding:10px 4px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:64px;justify-content:center;text-align:center;line-height:1.2}
+.small-btn span:first-child{font-size:22px}
+/* Sync badge */
+.sync-badge{display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600;margin:10px 0 14px}
+.sync-badge.ok{background:var(--success-bg);color:var(--success)}
+.sync-badge.warn{background:var(--warning-bg);color:var(--warning)}
+.sync-badge.info{background:var(--info-bg);color:var(--info)}
+.sync-badge.plain{background:var(--card);border:1px dashed var(--border2);color:var(--text2)}
+.sb-err{font-weight:400;font-size:12px;color:var(--danger);margin-top:2px}
+/* Forms */
+.form-group{margin-bottom:16px}
+label{display:block;font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px}
+input,select,textarea{width:100%;padding:13px 12px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:16px;background:var(--card);color:var(--text);outline:none;-webkit-appearance:none;appearance:none;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+textarea{resize:vertical;min-height:72px}
+.input-prefix{position:relative}
+.input-prefix span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:18px;pointer-events:none}
+.input-prefix input{padding-left:30px;font-size:20px;font-weight:700}
+.form-error{color:var(--danger);font-size:14px;font-weight:600;margin-top:4px}
+.form-hint{color:var(--text3);font-size:13px;margin-top:4px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:12px;font-weight:700;white-space:nowrap}
+.pill-success{background:var(--success-bg);color:var(--success)}
+.pill-warning{background:var(--warning-bg);color:var(--warning)}
+.pill-danger{background:var(--danger-bg);color:var(--danger)}
+.pill-info{background:var(--info-bg);color:var(--info)}
+.pill-neutral{background:var(--bg);color:var(--text2);border:1px solid var(--border)}
+.pill-primary{background:var(--primary-light);color:var(--primary-dark)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:20px 20px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:20px;font-weight:800;margin-bottom:18px}
+.confirm-overlay{background:rgba(0,0,0,.5);position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:20px}
+.confirm-box{background:var(--card);border-radius:var(--radius);padding:24px;width:100%;max-width:380px}
+/* Lists */
+.job-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;cursor:pointer}
+.job-card:active{border-color:var(--primary)}
+.pick-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 12px;border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;background:var(--card)}
+.pick-row:active{border-color:var(--primary)}
+.progress{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:var(--primary);border-radius:4px}
+.alert-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;font-size:15px}
+.alert-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.balance-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 6px;text-align:center}
+.balance-label{font-size:13px;color:var(--text2);font-weight:700;margin-bottom:4px}
+.balance-amount{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+.summary-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.summary-row:last-child{border-bottom:none}
+.detail-header{background:var(--card);border-bottom:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.back-btn{background:var(--bg);border:none;font-size:22px;cursor:pointer;color:var(--text);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notice{background:#fff9f0;border:1px solid #f9d5a0;border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;color:#7c4f1a;margin-bottom:16px}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
+.toggle{position:relative;width:48px;height:28px;flex-shrink:0;margin:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:14px;transition:.2s;cursor:pointer}
+.toggle-slider:before{content:'';position:absolute;height:22px;width:22px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked + .toggle-slider{background:var(--primary)}
+.toggle input:checked + .toggle-slider:before{transform:translateX(20px)}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{padding:10px 14px;border-radius:100px;font-size:15px;cursor:pointer;border:1.5px solid var(--border2);background:var(--card);color:var(--text);font-weight:600}
+.chip.selected{border-color:var(--primary);background:var(--primary);color:#fff}
+.history-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.history-item:last-child{border-bottom:none}
+.history-dot{width:9px;height:9px;border-radius:50%;background:var(--border2);margin-top:7px;flex-shrink:0}
+.margin-card{background:linear-gradient(135deg,#fff8f0,#fff);border:1px solid #f9d5a0;border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+/* Activity */
+.act-card{padding:4px 14px}
+.act-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.act-row:last-child{border-bottom:none}
+.act-icon{width:40px;height:40px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.act-title{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-sub{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-amt{font-weight:800;font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.act-amt.in{color:var(--success)}
+.act-amt.out{color:var(--danger)}
+.act-amt.neutral{color:var(--text2)}
+/* Status buttons */
+.status-grid{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.status-btn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border2);background:var(--card);text-align:left;font-size:16px;cursor:pointer;color:var(--text)}
+.status-btn.on{border-color:var(--primary);background:var(--primary-light)}
+.status-btn:disabled{opacity:1}
+/* More menu */
+.menu-row{display:flex;align-items:center;gap:14px;padding:16px 4px;border-bottom:1px solid var(--border);cursor:pointer}
+.menu-row:last-child{border-bottom:none}
+.menu-icon{width:46px;height:46px;border-radius:12px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.call-btn{display:inline-flex;align-items:center;gap:6px;background:var(--success);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;text-decoration:none;font-size:15px}
+.steps{padding-left:20px;font-size:14px;line-height:1.7;color:var(--text)}
+.role-opt{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1.5px solid var(--border2);border-radius:12px;margin-bottom:8px;cursor:pointer;background:var(--card)}
+.role-opt.on{border-color:var(--primary);background:var(--primary-light)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:370px){.balance-amount{font-size:15px}.big-btn{font-size:16px}}
+</style>
+</head>
+<body>
+<div id="root"><div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:12px"><div style="font-size:32px">☀️</div><div style="color:#f47c20;font-weight:700;font-size:18px">Sunwicck</div><div style="color:#9ca3af;font-size:14px">Loading tracker…</div></div></div>
+<script type="text/babel">
+const {useState,useEffect,useMemo,useRef,createContext,useContext}=React;
+
+// ─── Constants ───────────────────────────────────────────────
+const STORAGE_KEY='sunwicck_v2';
+const DEVICE_KEY='sunwicck_device';
+const CATEGORIES=['Equipment','Extra materials','Fuel','Tolls','Parking','Snacks','Meals','Lodging','Vehicle maintenance','Shipping/import costs','Social media','Farm supplies','Other'];
+const VEHICLE_CATS=['Fuel','Tolls','Parking','Vehicle maintenance'];
+const JOB_STATUSES=['Inquiry','Confirmed','Scheduled','Installing','Completed'];
+const PAYMENT_SOURCES=['cash','bank','gcash'];
+const SRC_LABEL={cash:'Cash',bank:'Bank',gcash:'GCash',advance:'From an advance'};
+const BUSINESSES=['solar','farm','shared','personal'];
+const LEAD_SOURCES=['Facebook','Referral','Walk-in','Barangay','Repeat customer','Other'];
+const COLLS=['people','customers','jobs','customerPayments','equipmentPurchases','inventory','jobEquipment','advances','advanceReturns','expenses','personPayments','feeRecords','farmActivities','farmIncome','vehicles','transfers','statusLog'];
+const STATUS_META={
+  Inquiry:   {icon:'🔍',hint:'New lead, asking about a system'},
+  Confirmed: {icon:'✅',hint:'Customer said yes'},
+  Scheduled: {icon:'📅',hint:'Install date is set'},
+  Installing:{icon:'🔧',hint:'Team is installing now'},
+  Completed: {icon:'☀️',hint:'Installation finished'},
+};
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+const nowISO=()=>new Date().toISOString();
+const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const cap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+const peso=n=>(n<0?'-':'')+'₱'+Math.abs(Math.round(n||0)).toLocaleString('en-PH');
+const fmtUSD=(n,s)=>s&&s.showUSD&&s.usdRate?peso(n)+' / $'+Math.round(Math.abs(n)/s.usdRate).toLocaleString():peso(n);
+const fmtDate=s=>{if(!s)return'';const d=new Date(s+'T00:00:00');if(isNaN(d))return s;return d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'})};
+const fmtStamp=iso=>{if(!iso)return'';const d=new Date(iso);return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})};
+const sum=(arr,f)=>arr.reduce((s,x)=>s+(f?f(x):x||0),0);
+const statusColor=s=>({Inquiry:'pill-neutral',Confirmed:'pill-info',Scheduled:'pill-primary',Installing:'pill-warning',Completed:'pill-success'}[s]||'pill-neutral');
+const payStatusColor=s=>({Unpaid:'pill-danger','Partially paid':'pill-warning','Fully paid':'pill-success'}[s]||'pill-neutral');
+
+// ─── Demo Data ────────────────────────────────────────────────
+function makeDemoData(){
+  const people=[
+    {id:'p1',name:'Meribel',role:'Role unconfirmed',notes:'',active:true},
+    {id:'p2',name:'Joel',role:'Installation lead',notes:"Has his own crew. Arrangement to confirm.",active:true},
+    {id:'p3',name:'Laura',role:'Social media',notes:'',active:true},
+    {id:'p4',name:'Erning',role:'Farm worker',notes:'',active:true},
+    {id:'p5',name:'Rachel',role:'Farm worker',notes:'',active:true},
+    {id:'p6',name:'Bantor',role:'External',notes:'Arrangement unconfirmed.',active:true},
+    {id:'p7',name:'Nancy',role:'External',notes:'Arrangement unconfirmed.',active:true},
+  ];
+  const customers=[
+    {id:'c1',name:'Santos Family',phone:'09171234567'},
+    {id:'c2',name:'Reyes Household',phone:'09281234567'},
+    {id:'c3',name:'Cruz General Store',phone:'09391234567'},
+  ];
+  const jobs=[
+    {id:'j1',customerId:'c1',address:{barangay:'Brgy. San Isidro',city:'Lipa City',province:'Batangas',mapLink:''},
+     package:'5kW Residential',systemSize:'5kW',agreedPrice:295000,plannedDate:'2024-11-10',
+     status:'Completed',assignedTeam:"Joel's Team",notes:'Roof mount. Customer requested south-facing panels.',
+     paymentSchedule:'₱100,000 deposit, balance on completion',leadSource:'Facebook',createdAt:'2024-10-25'},
+    {id:'j2',customerId:'c2',address:{barangay:'Brgy. Sampaguita',city:'Calamba City',province:'Laguna',mapLink:''},
+     package:'3kW Residential',systemSize:'3kW',agreedPrice:180000,plannedDate:'2024-12-05',
+     status:'Installing',assignedTeam:"Joel's Team",notes:'Ground mount on back lot.',
+     paymentSchedule:'Pay as installed',leadSource:'Referral',createdAt:'2024-11-01'},
+    {id:'j3',customerId:'c3',address:{barangay:'Brgy. Poblacion',city:'General Trias',province:'Cavite',mapLink:''},
+     package:'10kW Commercial',systemSize:'10kW',agreedPrice:420000,plannedDate:'2025-01-15',
+     status:'Scheduled',assignedTeam:"Joel's Team",notes:'Commercial store. 3-phase system.',
+     paymentSchedule:'30% deposit, 70% on completion',leadSource:'Walk-in',createdAt:'2024-11-15'},
+  ];
+  const customerPayments=[
+    {id:'cp1',jobId:'j1',amount:100000,date:'2024-10-30',source:'bank',notes:'Initial deposit'},
+    {id:'cp2',jobId:'j2',amount:50000,date:'2024-11-05',source:'gcash',notes:'Down payment'},
+  ];
+  const equipmentPurchases=[
+    {id:'eq1',supplier:'Shenzhen SolarTech Co.',purchaseDate:'2024-10-15',
+     originalCurrency:'USD',originalAmount:1800,phpCost:102600,exchangeRate:57,exchangeRateDate:'2024-10-15',
+     shippingCost:12000,importCost:3000,
+     items:[{description:'550W Monocrystalline Panels',quantity:10},{description:'5kW Hybrid Inverter',quantity:1}],
+     totalLandedCost:117600,amountPaid:102600,paymentSource:'bank',status:'Received',
+     notes:'All items accounted for, good condition.',createdAt:'2024-10-15'},
+  ];
+  // Real inventory from SUNWICCK Inventory List, October ending quantities
+  const I=(code,category,description,unit,quantity,notes='')=>{
+    const typeMap={Panels:'panel',Inverters:'inverter',Batteries:'battery'};
+    return{id:code,code,type:typeMap[category]||'other',category,description,unit,quantity,unitCost:0,purchaseId:null,notes};
+  };
+  const inventory=[
+    I('INV-001','Accessories','Automatic Transfer Switch (Dual Power)','pc',5),
+    I('INV-002','Breakers','Battery DC Breaker','pc',6),
+    I('INV-003','Breakers','AC Circuit Breaker (for water pump)','pc',5),
+    I('INV-004','Accessories','5-Way Casing','pc',14),
+    I('INV-005','Breakers','Solar DC Circuit Breaker','pc',0),
+    I('INV-006','Inverters','AMIBA Solar Inverter 10kW','pc',1),
+    I('INV-007','Inverters','AMIBA Solar Inverter 6.2kW','pc',0),
+    I('INV-008','Inverters','AMIBA Solar Inverter 10.2kW','pc',2),
+    I('INV-009','Inverters','AMIBA Solar Inverter 12kW','pc',1),
+    I('INV-010','Inverters','AMIBA Solar Inverter 3.5kW','pc',2),
+    I('INV-011','Inverters','AMIBA Solar Inverter 6.5kW','pc',1),
+    I('INV-040','Inverters','Hybrid Solar Inverter 11kW','pc',1),
+    I('INV-012','Batteries','Battery','pc',4),
+    I('INV-050','Batteries','Battery 290mAh','pc',1),
+    I('INV-013','Pumps','Solar Water Pump','pc',25),
+    I('INV-014','Lighting','Ceiling Solar Light 500W','pc',20),
+    I('INV-015','Lighting','Solar Street Light 500W','pc',9),
+    I('INV-016','Lighting','IP67 Solar Flood Light (complete set)','pc',5),
+    I('INV-017','Lighting','IP68 Solar Light 400W','pc',6),
+    I('INV-018','Lighting','Flood Light, old (complete set)','pc',5),
+    I('INV-021','Lighting','Flood Light Big Set, old (complete)','pc',6,'Complete with panel (old)'),
+    I('INV-047','Lighting','IP65 Solar Street Light','pc',7),
+    I('INV-019','Accessories','12-Way Channel Box','pc',7),
+    I('INV-020','Accessories','8-Way Channel Box','pc',1),
+    I('INV-024','Accessories','Tech Screw','pc',300),
+    I('INV-055','Accessories','PVC Elbow Connector','pc',20),
+    I('INV-056','Accessories','Connector Adapter','pc',20),
+    I('INV-053','Accessories','AC/DC SPD (Surge Protector)','pc',0,'Oct: began untracked; recount needed'),
+    I('INV-022','Mounting','Aderonda Rack (small)','pc',4),
+    I('INV-023','Mounting','Railings','pc',32),
+    I('INV-025','Mounting','N-Clamp','pc',81),
+    I('INV-026','Mounting','Grounding Clamp','pc',9),
+    I('INV-027','Mounting','L-Foot Bracket','pc',51),
+    I('INV-028','Mounting','Railing Connector (Splice)','pc',14),
+    I('INV-029','Mounting','Center Clamp','pc',54),
+    I('INV-052b','Mounting','Railings, old','pc',7),
+    I('INV-053b','Mounting','Railings, new','pc',64),
+    I('INV-030','Irrigation','Check Valve No. 3','pc',1),
+    I('INV-031','Irrigation','Check Valve No. 4','pc',1),
+    I('INV-032','Irrigation','GI Pipe 4 inches','pc',4),
+    I('INV-033','Irrigation','Elbow No. 4','pc',2),
+    I('INV-034','Irrigation','Elbow No. 3','pc',1),
+    I('INV-035','Irrigation','Knee Plate 3 inch','pc',2),
+    I('INV-036','Irrigation','Knee Plate 4 inch','pc',2),
+    I('INV-037','Irrigation','Adaptor','pc',1),
+    I('INV-038','Cables','Solar Wire, Red','roll',4,'Loose tira-tira also released, not counted'),
+    I('INV-039','Cables','Solar Wire, Black','roll',3,'Loose tira-tira also released, not counted'),
+    I('INV-040b','Cables','Used Wire','box',3),
+    I('INV-054','Cables','Wire No.8 Red','pc',0,'Loose pieces only, qty not counted'),
+    I('INV-055b','Cables','Wire No.8 Blue','pc',0,'Loose pieces only, qty not counted'),
+    I('INV-041','Connectors','Flex Con Connector','pc',20),
+    I('INV-045','Connectors','MC4 Male Connector','pc',107),
+    I('INV-046','Connectors','MC4 Female Connector','pc',129),
+    I('INV-047b','Connectors','MC4 Connector (Mixed Male/Female)','pc',30,'Mixed, not separately counted'),
+    I('INV-042','Hose','Flex Con Hose, Black','roll',13),
+    I('INV-043','Hose','Flex Con Hose, Orange','roll',4,'Loose tira-tira also released'),
+    I('INV-044','Hose','PVC Wire Conduit / Plastic Molding','box',0,'Oct: -1 ending qty, recount needed'),
+    I('INV-048','Panels','Big Solar Panel','pc',4),
+    I('INV-049','Panels','Small Solar Panel','pc',23),
+    I('INV-051','Breakers','Circuit Breaker Box','pc',9),
+    I('INV-052','Breakers','AC Circuit Breaker 63A','pc',0,'Oct: began untracked; recount needed'),
+  ];
+  const jobEquipment=[
+    {id:'je1',jobId:'j1',purchaseId:'eq1',description:'10x Panels + 5kW Inverter (from eq1 batch)',quantity:1,unitCost:117600,totalCost:117600,date:'2024-11-05'},
+  ];
+  const advances=[
+    {id:'adv1',personId:'p2',amount:5000,paymentSource:'cash',jobId:'j1',
+     date:'2024-11-08',status:'open',notes:'Installation day expenses, Santos job',createdAt:'2024-11-08'},
+  ];
+  const expenses=[
+    {id:'exp1',amount:2000,business:'solar',category:'Fuel',paymentSource:'advance',advanceId:'adv1',jobId:'j1',vehicleId:'v1',description:'Diesel, Santos installation day',date:'2024-11-10',createdAt:'2024-11-10'},
+    {id:'exp2',amount:500,business:'solar',category:'Snacks',paymentSource:'advance',advanceId:'adv1',jobId:'j1',description:'Team merienda, Santos job',date:'2024-11-10',createdAt:'2024-11-10'},
+    {id:'exp3',amount:1500,business:'solar',category:'Extra materials',paymentSource:'advance',advanceId:'adv1',jobId:'j1',description:'Mounting bolts and sealant',date:'2024-11-10',createdAt:'2024-11-10'},
+    {id:'exp4',amount:1200,business:'solar',category:'Fuel',paymentSource:'cash',jobId:'j2',vehicleId:'v1',description:'Fuel for Reyes site visit',date:'2024-11-12',createdAt:'2024-11-12'},
+    {id:'exp5',amount:350,business:'solar',category:'Snacks',paymentSource:'cash',jobId:'j2',description:'Team snacks, Reyes site',date:'2024-11-12',createdAt:'2024-11-12'},
+  ];
+  const farmActivities=[
+    {id:'fa1',name:'Wet Season Operations 2024',type:'general',startDate:'2024-07-01',endDate:null,notes:'General farm operations for wet season.',active:true},
+  ];
+  const vehicles=[{id:'v1',name:'Sunwicck Truck',plate:'LMN-1234'}];
+  const settings={usdRate:57,usdRateDate:'2024-11-15',showUSD:false,cashBalance:91550,bankBalance:200000,gcashBalance:45000,sheetsScriptUrl:'',lastSheetsSync:null,sheetsSyncEnabled:false};
+  return migrate({people,customers,jobs,customerPayments,equipmentPurchases,inventory,jobEquipment,
+    advances,advanceReturns:[],expenses,personPayments:[],feeRecords:[],
+    farmActivities,farmIncome:[],vehicles,transfers:[],statusLog:[],settings,version:2});
+}
+function migrate(d){
+  const o={...(d||{})};
+  COLLS.forEach(k=>{if(!Array.isArray(o[k]))o[k]=[];});
+  o.settings={usdRate:57,usdRateDate:'',showUSD:false,cashBalance:0,bankBalance:0,gcashBalance:0,sheetsScriptUrl:'',lastSheetsSync:null,sheetsSyncEnabled:false,...(o.settings||{})};
+  o.version=2;
+  return o;
+}
+// Clears all entries but keeps the inventory list, people, vehicles and sheet settings
+function makeCleanData(d){
+  return migrate({inventory:d.inventory,people:d.people,vehicles:d.vehicles,farmActivities:[],
+    settings:{...d.settings,cashBalance:0,bankBalance:0,gcashBalance:0}});
+}
+
+// ─── Storage ──────────────────────────────────────────────────
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return makeDemoData();
+    const d=JSON.parse(raw);
+    if(!d.version||d.version<2)return makeDemoData();
+    return migrate(d);
+  }catch{return makeDemoData();}
+}
+function saveData(d){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}catch{}}
+function loadDevice(){
+  try{return{role:'main',syncUrl:'',syncKey:'',pending:false,lastSent:null,lastPulled:null,remoteSavedAt:null,...JSON.parse(localStorage.getItem(DEVICE_KEY)||'{}')};}
+  catch{return{role:'main',syncUrl:'',syncKey:'',pending:false};}
+}
+function saveDevice(d){try{localStorage.setItem(DEVICE_KEY,JSON.stringify(d));}catch{}}
+
+// ─── Calculations ─────────────────────────────────────────────
+function addTo(b,src,amt){if(src==='cash')b.cash+=amt;else if(src==='bank')b.bank+=amt;else if(src==='gcash')b.gcash+=amt;}
+function computeBalances(d){
+  const s=d.settings;
+  const b={cash:parseFloat(s.cashBalance)||0,bank:parseFloat(s.bankBalance)||0,gcash:parseFloat(s.gcashBalance)||0};
+  d.customerPayments.forEach(p=>addTo(b,p.source,p.amount));
+  d.farmIncome.forEach(i=>addTo(b,i.source,i.amount));
+  d.advances.forEach(a=>addTo(b,a.paymentSource,-a.amount));
+  d.advanceReturns.forEach(r=>addTo(b,r.source||'cash',r.amount));
+  d.expenses.filter(e=>e.paymentSource!=='advance').forEach(e=>addTo(b,e.paymentSource,-e.amount));
+  d.personPayments.forEach(p=>addTo(b,p.paymentSource,-p.amount));
+  d.equipmentPurchases.forEach(p=>addTo(b,p.paymentSource,-(p.amountPaid||0)));
+  d.feeRecords.filter(f=>f.paid).forEach(f=>addTo(b,f.paidSource,-f.amount));
+  d.transfers.forEach(t=>{addTo(b,t.from,-t.amount);addTo(b,t.to,t.amount);});
+  b.total=b.cash+b.bank+b.gcash;
+  return b;
+}
+const paidForJob=(job,cps)=>sum(cps.filter(p=>p.jobId===job.id),p=>p.amount);
+function jobPaymentStatus(job,cps){
+  const total=paidForJob(job,cps);
+  if(total<=0)return'Unpaid';
+  if(total>=(job.agreedPrice||0))return'Fully paid';
+  return'Partially paid';
+}
+function jobBalance(job,cps){return(job.agreedPrice||0)-paidForJob(job,cps);}
+function jobPct(job,cps){const p=job.agreedPrice||0;return p>0?Math.min(100,Math.round(paidForJob(job,cps)/p*100)):0;}
+function advanceUnsettled(adv,expenses,returns){
+  return adv.amount-sum(expenses.filter(e=>e.advanceId===adv.id),e=>e.amount)-sum(returns.filter(r=>r.advanceId===adv.id),r=>r.amount);
+}
+function jobMargin(job,d){
+  const paid=paidForJob(job,d.customerPayments);
+  const equipCost=sum(d.jobEquipment.filter(e=>e.jobId===job.id),e=>e.totalCost);
+  const directExp=sum(d.expenses.filter(e=>e.jobId===job.id),e=>e.amount);
+  const teamPaid=sum(d.personPayments.filter(p=>p.jobId===job.id),p=>p.amount);
+  const fees=d.feeRecords.filter(f=>f.jobId===job.id);
+  const feesOwed=sum(fees.filter(f=>!f.paid),f=>f.amount);
+  const feesPaid=sum(fees.filter(f=>f.paid),f=>f.amount);
+  const totalCost=equipCost+directExp+teamPaid+feesOwed+feesPaid;
+  const price=job.agreedPrice||0;
+  return{price,paid,equipCost,directExp,teamPaid,feesOwed,feesPaid,totalCost,marginOnPrice:price-totalCost,marginOnCollected:paid-totalCost};
+}
+const custOf=(d,job)=>job?d.customers.find(c=>c.id===job.customerId):null;
+const jobName=(d,job)=>{if(!job)return'';const c=custOf(d,job);const s=job.systemSize||job.package;return(c?.name||'Unknown')+(s?' · '+s:'');};
+const personName=(d,id)=>d.people.find(p=>p.id===id)?.name||'Unknown';
+const owedTotal=d=>sum(d.jobs.filter(j=>j.status!=='Inquiry'),j=>Math.max(0,jobBalance(j,d.customerPayments)));
+const advHeld=d=>sum(d.advances.filter(a=>a.status==='open'),a=>Math.max(0,advanceUnsettled(a,d.expenses,d.advanceReturns)));
+
+// Everything that happened, newest first
+function buildActivity(d){
+  const A=[];
+  const jl=id=>{const j=d.jobs.find(x=>x.id===id);return j?jobName(d,j):'';};
+  const parts=(...xs)=>xs.filter(Boolean).join(' · ');
+  d.customerPayments.forEach(p=>A.push({coll:'customerPayments',id:p.id,date:p.date,ts:p.createdAt,icon:'💰',title:'Payment received',sub:parts(jl(p.jobId),SRC_LABEL[p.source],p.notes),amount:p.amount,dir:'in'}));
+  d.expenses.forEach(e=>{
+    const adv=e.advanceId?d.advances.find(a=>a.id===e.advanceId):null;
+    A.push({coll:'expenses',id:e.id,date:e.date,ts:e.createdAt,icon:'💸',title:'Expense: '+e.category,
+      sub:parts(e.business!=='solar'?cap(e.business):'',jl(e.jobId),e.paymentSource==='advance'?(adv?personName(d,adv.personId)+"'s advance":'From an advance'):SRC_LABEL[e.paymentSource],e.description),
+      amount:e.amount,dir:e.paymentSource==='advance'?'neutral':'out'});
+  });
+  d.advances.forEach(a=>A.push({coll:'advances',id:a.id,date:a.date,ts:a.createdAt,icon:'🤝',title:'Advance to '+personName(d,a.personId),sub:parts(jl(a.jobId),SRC_LABEL[a.paymentSource],a.notes),amount:a.amount,dir:'out'}));
+  d.advanceReturns.forEach(r=>{const a=d.advances.find(x=>x.id===r.advanceId);A.push({coll:'advanceReturns',id:r.id,date:r.date,ts:r.createdAt,icon:'↩️',title:'Advance cash returned',sub:parts(a?personName(d,a.personId):'',SRC_LABEL[r.source||'cash'],r.notes),amount:r.amount,dir:'in'});});
+  d.personPayments.forEach(p=>A.push({coll:'personPayments',id:p.id,date:p.date,ts:p.createdAt,icon:'👤',title:'Paid '+personName(d,p.personId),sub:parts(cap(p.type),jl(p.jobId),SRC_LABEL[p.paymentSource],p.notes),amount:p.amount,dir:'out'}));
+  d.farmIncome.forEach(i=>{const act=d.farmActivities.find(a=>a.id===i.activityId);A.push({coll:'farmIncome',id:i.id,date:i.date,ts:i.createdAt,icon:'🌾',title:'Farm income',sub:parts(act?.name,i.description,SRC_LABEL[i.source]),amount:i.amount,dir:'in'});});
+  d.transfers.forEach(t=>A.push({coll:'transfers',id:t.id,date:t.date,ts:t.createdAt,icon:'🔁',title:'Moved money',sub:parts(SRC_LABEL[t.from]+' to '+SRC_LABEL[t.to],t.notes),amount:t.amount,dir:'neutral'}));
+  d.equipmentPurchases.forEach(p=>A.push({coll:'equipmentPurchases',id:p.id,date:p.purchaseDate,ts:p.createdAt,icon:'🚢',title:'China order: '+(p.supplier||'Supplier'),sub:parts(p.status,SRC_LABEL[p.paymentSource]),amount:p.amountPaid||0,dir:'out'}));
+  d.feeRecords.filter(f=>f.paid).forEach(f=>A.push({coll:'feeRecords',id:f.id,date:f.paidDate||f.date,ts:f.createdAt,icon:'🧾',title:'Fee paid',sub:parts(f.description,f.owedTo,jl(f.jobId),SRC_LABEL[f.paidSource]),amount:f.amount,dir:'out'}));
+  d.statusLog.forEach(s=>A.push({coll:'statusLog',id:s.id,date:s.date,ts:s.createdAt,icon:STATUS_META[s.to]?.icon||'🔧',title:'Job update: '+s.to,sub:parts(jl(s.jobId),s.from?'was '+s.from:''),amount:null,dir:'neutral'}));
+  return A.sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.ts||'').localeCompare(a.ts||''));
+}
+
+// Readable tabs written into the Google Sheet
+function buildSheetTables(d){
+  const b=computeBalances(d);
+  const acts=buildActivity(d);
+  const now=new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'});
+  const txt=v=>v?"'"+v:'';
+  const Summary=[['Item','Value'],['Last update (PH time)',now],['Cash',b.cash],['Bank',b.bank],['GCash',b.gcash],['Total money',b.total],
+    ['Customers still owe',owedTotal(d)],['Advance money still with workers',advHeld(d)],['Active jobs',d.jobs.filter(j=>j.status!=='Completed').length]];
+  const Activity=[['Date','What','Details','Money in','Money out','Other']].concat(acts.map(a=>[a.date||'',a.title,a.sub||'',a.dir==='in'?a.amount:'',a.dir==='out'?a.amount:'',a.dir==='neutral'&&a.amount!=null?a.amount:'']));
+  const Jobs=[['Customer','Phone','Location','Package','Status','Price','Paid','Still owes','Planned date','Team','Found us via','Margin estimate']].concat(d.jobs.map(j=>{
+    const c=custOf(d,j);const m=jobMargin(j,d);
+    return[c?.name||'',txt(c?.phone),[j.address?.barangay,j.address?.city,j.address?.province].filter(Boolean).join(', '),j.package||j.systemSize||'',j.status,m.price,m.paid,m.price-m.paid,j.plannedDate||'',j.assignedTeam||'',j.leadSource||'',m.marginOnPrice];
+  }));
+  const Customers=[['Name','Phone','Jobs','Total agreed','Paid','Still owes','Notes']].concat(d.customers.map(c=>{
+    const js=d.jobs.filter(j=>j.customerId===c.id);const agreed=sum(js,j=>j.agreedPrice||0);const paid=sum(js,j=>paidForJob(j,d.customerPayments));
+    return[c.name,txt(c.phone),js.length,agreed,paid,agreed-paid,c.notes||''];
+  }));
+  const People=[['Name','Role','Total paid','Advance money held now']].concat(d.people.map(p=>[p.name,p.role||'',sum(d.personPayments.filter(x=>x.personId===p.id),x=>x.amount),
+    sum(d.advances.filter(a=>a.personId===p.id&&a.status==='open'),a=>advanceUnsettled(a,d.expenses,d.advanceReturns))]));
+  return{'App Summary':Summary,'App Activity':Activity,'App Jobs':Jobs,'App Customers':Customers,'App People':People};
+}
+
+// ─── Network helpers ──────────────────────────────────────────
+async function postJSON(url,payload,key){
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(key?{...payload,key}:payload)});
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const j=await res.json();
+  if(!j.ok)throw new Error(j.error||'Sheet error');
+  return j;
+}
+async function getJSON(url,params,key){
+  const q=new URLSearchParams({...params,...(key?{key}:{}),t:Date.now()});
+  const res=await fetch(url+(url.includes('?')?'&':'?')+q.toString());
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const j=await res.json();
+  if(!j.ok)throw new Error(j.error||'Sheet error');
+  return j;
+}
+
+// ─── Context ──────────────────────────────────────────────────
+const AppCtx=createContext(null);
+function useApp(){return useContext(AppCtx);}
+
+// ─── Small components ─────────────────────────────────────────
+function Modal({open,onClose,title,children}){
+  if(!open)return null;
+  return <div className="modal-backdrop" onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
+    <div className="modal">
+      <div className="modal-handle"/>
+      {title&&<div className="modal-title">{title}</div>}
+      {children}
+    </div>
+  </div>;
+}
+function Confirm({open,message,onConfirm,onCancel,danger,confirmLabel}){
+  if(!open)return null;
+  return <div className="confirm-overlay">
+    <div className="confirm-box">
+      <h3 style={{marginBottom:12}}>{danger?'⚠️ ':''}{message}</h3>
+      <div className="btn-row">
+        <button className="btn btn-outline btn-full" onClick={onCancel}>Cancel</button>
+        <button className={`btn btn-full ${danger?'btn-danger':'btn-primary'}`} onClick={onConfirm}>{confirmLabel||'Confirm'}</button>
+      </div>
+    </div>
+  </div>;
+}
+function TypedConfirm({open,word,message,onConfirm,onCancel}){
+  const[v,setV]=useState('');
+  if(!open)return null;
+  const ok=v.trim().toUpperCase()===word;
+  return <div className="confirm-overlay">
+    <div className="confirm-box">
+      <h3 style={{marginBottom:8}}>⚠️ {message}</h3>
+      <div className="muted" style={{marginBottom:12}}>Type <strong>{word}</strong> below to confirm.</div>
+      <input value={v} onChange={e=>setV(e.target.value)} autoCapitalize="characters" placeholder={word}/>
+      <div className="btn-row">
+        <button className="btn btn-outline btn-full" onClick={()=>{setV('');onCancel();}}>Cancel</button>
+        <button className="btn btn-danger btn-full" disabled={!ok} onClick={()=>{setV('');onConfirm();}}>Confirm</button>
+      </div>
+    </div>
+  </div>;
+}
+function Pill({className,children}){return <span className={`pill ${className||''}`}>{children}</span>;}
+function ChipSelect({options,value,onChange,labels}){
+  return <div className="chip-group">
+    {options.map(o=><button type="button" key={o} className={`chip${value===o?' selected':''}`} onClick={()=>onChange(o)}>{(labels&&labels[o])||cap(o)}</button>)}
+  </div>;
+}
+function AmountInput({value,onChange,label,required}){
+  return <div className="form-group">
+    {label&&<label>{label}{required&&<span style={{color:'var(--danger)'}}> *</span>}</label>}
+    <div className="input-prefix"><span>₱</span>
+      <input type="number" inputMode="decimal" value={value} onChange={e=>onChange(e.target.value)} placeholder="0" min="0" step="any"/>
+    </div>
+  </div>;
+}
+function Field({label,children,hint,error,required}){
+  return <div className="form-group">
+    {label&&<label>{label}{required&&<span style={{color:'var(--danger)'}}> *</span>}</label>}
+    {children}
+    {hint&&<div className="form-hint">{hint}</div>}
+    {error&&<div className="form-error">{error}</div>}
+  </div>;
+}
+function SaveRow({onCancel,onSave,label,err}){
+  return <>
+    {err&&<div className="form-error" style={{marginBottom:12}}>{err}</div>}
+    <div className="btn-row">
+      <button className="btn btn-outline btn-full" onClick={onCancel}>Cancel</button>
+      <button className="btn btn-primary btn-full" onClick={onSave}>{label||'Save'}</button>
+    </div>
+  </>;
+}
+function JobSelect({value,onChange,noneLabel}){
+  const{data}=useApp();
+  const active=data.jobs.filter(j=>j.status!=='Completed');
+  const done=data.jobs.filter(j=>j.status==='Completed');
+  return <select value={value} onChange={e=>onChange(e.target.value)}>
+    <option value="">{noneLabel||'Select job…'}</option>
+    {active.length>0&&<optgroup label="Active jobs">{active.map(j=><option key={j.id} value={j.id}>{jobName(data,j)}</option>)}</optgroup>}
+    {done.length>0&&<optgroup label="Completed">{done.map(j=><option key={j.id} value={j.id}>{jobName(data,j)}</option>)}</optgroup>}
+  </select>;
+}
+function DateField({value,onChange,label}){
+  return <Field label={label||'Date'}><input type="date" value={value} onChange={e=>onChange(e.target.value)}/></Field>;
+}
+function DetailHeader({title,sub,onBack,right}){
+  return <div className="detail-header">
+    {onBack&&<button className="back-btn" onClick={onBack} aria-label="Back">←</button>}
+    <div style={{flex:1,minWidth:0}}>
+      <h2 style={{marginBottom:0,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h2>
+      {sub&&<div className="muted" style={{fontSize:13}}>{sub}</div>}
+    </div>
+    {right}
+  </div>;
+}
+function StatusButtons({current,onPick}){
+  return <div className="status-grid">
+    {JOB_STATUSES.map(s=>{const m=STATUS_META[s];const on=s===current;
+      return <button key={s} type="button" className={'status-btn'+(on?' on':'')} disabled={on} onClick={()=>onPick(s)}>
+        <span style={{fontSize:26}}>{m.icon}</span>
+        <span><strong>{s}</strong><span className="muted" style={{display:'block',fontSize:13}}>{on?'Current stage':m.hint}</span></span>
+      </button>;})}
+  </div>;
+}
+function setJobStatus(update,job,to){
+  if(!job||to===job.status)return;
+  update(d=>({...d,jobs:d.jobs.map(j=>j.id===job.id?{...j,status:to}:j),
+    statusLog:[...d.statusLog,{id:uid(),jobId:job.id,from:job.status,to,date:today(),createdAt:nowISO()}]}));
+}
+
+// ─── Log forms ────────────────────────────────────────────────
+function ExpenseForm({onClose,prefillJob,prefillBusiness}){
+  const{data,update}=useApp();
+  const[amount,setAmount]=useState('');
+  const[business,setBusiness]=useState(prefillBusiness||'solar');
+  const[category,setCategory]=useState('');
+  const[source,setSource]=useState('cash');
+  const[jobId,setJobId]=useState(prefillJob||'');
+  const[farmActId,setFarmActId]=useState('');
+  const[desc,setDesc]=useState('');
+  const[date,setDate]=useState(today());
+  const[vehicleId,setVehicleId]=useState('');
+  const[advanceId,setAdvanceId]=useState('');
+  const[err,setErr]=useState('');
+  const openAdv=data.advances.filter(a=>a.status==='open');
+  const isVehicle=VEHICLE_CATS.includes(category);
+  function save(){
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much');
+    if(!category)return setErr('Pick what it was for');
+    if(source==='advance'&&!advanceId)return setErr("Pick whose advance it came from");
+    const adv=source==='advance'?data.advances.find(a=>a.id===advanceId):null;
+    update(d=>({...d,expenses:[...d.expenses,{id:uid(),amount:amt,business,category,paymentSource:source,
+      advanceId:adv?adv.id:'',jobId:business==='solar'?(jobId||adv?.jobId||''):'',farmActivityId:business==='farm'?farmActId:'',
+      vehicleId:isVehicle?vehicleId:'',description:desc,date,createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <AmountInput label="How much?" value={amount} onChange={setAmount} required/>
+    <Field label="What was it for?" required><ChipSelect options={CATEGORIES} value={category} onChange={setCategory}/></Field>
+    <Field label="Paid with" required>
+      <ChipSelect options={[...PAYMENT_SOURCES,'advance']} value={source} onChange={setSource} labels={SRC_LABEL}/>
+    </Field>
+    {source==='advance'&&<Field label="Whose advance?" required>
+      {openAdv.length===0?<div className="muted">No open advances. Give an advance first.</div>:
+      <select value={advanceId} onChange={e=>setAdvanceId(e.target.value)}>
+        <option value="">Select…</option>
+        {openAdv.map(a=><option key={a.id} value={a.id}>{personName(data,a.personId)}: {peso(a.amount)} on {fmtDate(a.date)} ({peso(advanceUnsettled(a,data.expenses,data.advanceReturns))} left)</option>)}
+      </select>}
+    </Field>}
+    <Field label="Which business?"><ChipSelect options={BUSINESSES} value={business} onChange={setBusiness}/></Field>
+    {business==='solar'&&<Field label="For which job?"><JobSelect value={jobId} onChange={setJobId} noneLabel="Not for a specific job"/></Field>}
+    {business==='farm'&&data.farmActivities.length>0&&<Field label="Farm activity">
+      <select value={farmActId} onChange={e=>setFarmActId(e.target.value)}>
+        <option value="">General farm</option>
+        {data.farmActivities.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
+      </select>
+    </Field>}
+    {isVehicle&&data.vehicles.length>0&&<Field label="Vehicle">
+      <select value={vehicleId} onChange={e=>setVehicleId(e.target.value)}>
+        <option value="">None</option>
+        {data.vehicles.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}
+      </select>
+    </Field>}
+    <Field label="Notes (optional)"><input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="e.g. Diesel for Santos job"/></Field>
+    <DateField value={date} onChange={setDate}/>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Expense" err={err}/>
+  </>;
+}
+function CustomerPaymentForm({onClose,prefillJob}){
+  const{data,update}=useApp();
+  const[jobId,setJobId]=useState(prefillJob||'');
+  const[amount,setAmount]=useState('');
+  const[source,setSource]=useState('cash');
+  const[date,setDate]=useState(today());
+  const[notes,setNotes]=useState('');
+  const[err,setErr]=useState('');
+  function save(){
+    if(!jobId)return setErr('Pick the job');
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much');
+    update(d=>({...d,customerPayments:[...d.customerPayments,{id:uid(),jobId,amount:amt,source,date,notes,createdAt:nowISO()}]}));
+    onClose();
+  }
+  const job=data.jobs.find(j=>j.id===jobId);
+  const paid=job?paidForJob(job,data.customerPayments):0;
+  return <>
+    <Field label="Which customer / job?" required><JobSelect value={jobId} onChange={setJobId}/></Field>
+    {job&&<div className="card-sm" style={{background:'var(--info-bg)',border:'1px solid #bfdbfe',marginBottom:16}}>
+      <div className="summary-row"><span className="muted">Agreed price</span><strong>{peso(job.agreedPrice)}</strong></div>
+      <div className="summary-row"><span className="muted">Paid so far</span><strong>{peso(paid)}</strong></div>
+      <div className="summary-row"><span className="muted">Still owes</span><strong style={{color:'var(--danger)'}}>{peso((job.agreedPrice||0)-paid)}</strong></div>
+    </div>}
+    <AmountInput label="How much was received?" value={amount} onChange={setAmount} required/>
+    <Field label="Received as" required><ChipSelect options={PAYMENT_SOURCES} value={source} onChange={setSource} labels={SRC_LABEL}/></Field>
+    <DateField value={date} onChange={setDate}/>
+    <Field label="Notes (optional)"><input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="e.g. Deposit, final payment"/></Field>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Payment" err={err}/>
+  </>;
+}
+function AdvanceForm({onClose,prefillPerson,prefillJob}){
+  const{data,update}=useApp();
+  const[personId,setPersonId]=useState(prefillPerson||'');
+  const[amount,setAmount]=useState('');
+  const[source,setSource]=useState('cash');
+  const[jobId,setJobId]=useState(prefillJob||'');
+  const[notes,setNotes]=useState('');
+  const[date,setDate]=useState(today());
+  const[err,setErr]=useState('');
+  function save(){
+    if(!personId)return setErr('Pick who you gave it to');
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much');
+    update(d=>({...d,advances:[...d.advances,{id:uid(),personId,amount:amt,paymentSource:source,jobId,notes,date,status:'open',createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <div className="notice">Money you hand someone to spend for the business. Log what they spend later as expenses "From an advance".</div>
+    <Field label="Given to" required>
+      <select value={personId} onChange={e=>setPersonId(e.target.value)}>
+        <option value="">Select person…</option>
+        {data.people.filter(p=>p.active!==false).map(p=><option key={p.id} value={p.id}>{p.name}{p.role?' ('+p.role+')':''}</option>)}
+      </select>
+    </Field>
+    <AmountInput label="How much?" value={amount} onChange={setAmount} required/>
+    <Field label="Taken from" required><ChipSelect options={PAYMENT_SOURCES} value={source} onChange={setSource} labels={SRC_LABEL}/></Field>
+    <Field label="For which job? (optional)"><JobSelect value={jobId} onChange={setJobId} noneLabel="Not for a specific job"/></Field>
+    <Field label="Notes (optional)"><input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="What it's for"/></Field>
+    <DateField value={date} onChange={setDate}/>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Advance" err={err}/>
+  </>;
+}
+function AdvanceReturnForm({onClose,prefillAdvance}){
+  const{data,update}=useApp();
+  const open=data.advances.filter(a=>a.status==='open');
+  const[advId,setAdvId]=useState(prefillAdvance||'');
+  const[amount,setAmount]=useState('');
+  const[source,setSource]=useState('cash');
+  const[date,setDate]=useState(today());
+  const[err,setErr]=useState('');
+  const adv=data.advances.find(a=>a.id===advId);
+  const left=adv?advanceUnsettled(adv,data.expenses,data.advanceReturns):0;
+  function save(){
+    if(!adv)return setErr('Pick the advance');
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much came back');
+    update(d=>({...d,advanceReturns:[...d.advanceReturns,{id:uid(),advanceId:adv.id,amount:amt,source,date,notes:'Cash returned',createdAt:nowISO()}],
+      advances:d.advances.map(x=>x.id===adv.id&&amt>=left?{...x,status:'settled'}:x)}));
+    onClose();
+  }
+  function closeAdvance(){
+    update(d=>({...d,advances:d.advances.map(x=>x.id===adv.id?{...x,status:'settled'}:x)}));
+    onClose();
+  }
+  if(open.length===0)return <><div className="empty-state"><div className="empty-icon">🤝</div><p>No open advances right now.</p></div><button className="btn btn-outline btn-full" onClick={onClose}>Close</button></>;
+  return <>
+    <Field label="Which advance?" required>
+      <select value={advId} onChange={e=>setAdvId(e.target.value)}>
+        <option value="">Select…</option>
+        {open.map(a=><option key={a.id} value={a.id}>{personName(data,a.personId)}: {peso(a.amount)} on {fmtDate(a.date)}</option>)}
+      </select>
+    </Field>
+    {adv&&<div className="card-sm" style={{background:left<0?'var(--danger-bg)':'var(--warning-bg)',marginBottom:16}}>
+      <strong>{left>=0?`${personName(data,adv.personId)} still has ${peso(left)}`:`Overspent by ${peso(-left)}`}</strong>
+    </div>}
+    <AmountInput label="How much came back?" value={amount} onChange={setAmount} required/>
+    <Field label="Put back into"><ChipSelect options={PAYMENT_SOURCES} value={source} onChange={setSource} labels={SRC_LABEL}/></Field>
+    <DateField value={date} onChange={setDate}/>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Return" err={err}/>
+    {adv&&left<=0&&<button className="btn btn-secondary btn-full" style={{marginTop:10}} onClick={closeAdvance}>Close this advance (nothing to return)</button>}
+  </>;
+}
+function PayPersonForm({onClose,prefillPerson}){
+  const{data,update}=useApp();
+  const[personId,setPersonId]=useState(prefillPerson||'');
+  const[amount,setAmount]=useState('');
+  const[source,setSource]=useState('cash');
+  const[jobId,setJobId]=useState('');
+  const[type,setType]=useState('wage');
+  const[notes,setNotes]=useState('');
+  const[date,setDate]=useState(today());
+  const[err,setErr]=useState('');
+  function save(){
+    if(!personId)return setErr('Pick who you paid');
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much');
+    update(d=>({...d,personPayments:[...d.personPayments,{id:uid(),personId,amount:amt,paymentSource:source,jobId,type,notes,date,createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <Field label="Paid to" required>
+      <select value={personId} onChange={e=>setPersonId(e.target.value)}>
+        <option value="">Select person…</option>
+        {data.people.filter(p=>p.active!==false).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+      </select>
+    </Field>
+    <AmountInput label="How much?" value={amount} onChange={setAmount} required/>
+    <Field label="Type of payment"><ChipSelect options={['wage','fee','commission']} value={type} onChange={setType}/></Field>
+    <Field label="Paid with" required><ChipSelect options={PAYMENT_SOURCES} value={source} onChange={setSource} labels={SRC_LABEL}/></Field>
+    <Field label="For which job? (optional)"><JobSelect value={jobId} onChange={setJobId} noneLabel="Not for a specific job"/></Field>
+    <Field label="Notes (optional)"><input value={notes} onChange={e=>setNotes(e.target.value)}/></Field>
+    <DateField value={date} onChange={setDate}/>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Payment" err={err}/>
+  </>;
+}
+function TransferForm({onClose}){
+  const{update}=useApp();
+  const[from,setFrom]=useState('cash');
+  const[to,setTo]=useState('bank');
+  const[amount,setAmount]=useState('');
+  const[date,setDate]=useState(today());
+  const[notes,setNotes]=useState('');
+  const[err,setErr]=useState('');
+  function save(){
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much');
+    if(from===to)return setErr('From and To must be different');
+    update(d=>({...d,transfers:[...d.transfers,{id:uid(),from,to,amount:amt,date,notes,createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <div className="notice">Use this when money moves between your own accounts, like depositing cash in the bank. It is not income or expense.</div>
+    <Field label="From"><ChipSelect options={PAYMENT_SOURCES} value={from} onChange={setFrom} labels={SRC_LABEL}/></Field>
+    <Field label="To"><ChipSelect options={PAYMENT_SOURCES} value={to} onChange={setTo} labels={SRC_LABEL}/></Field>
+    <AmountInput label="How much?" value={amount} onChange={setAmount} required/>
+    <DateField value={date} onChange={setDate}/>
+    <Field label="Notes (optional)"><input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="e.g. Deposited at BDO"/></Field>
+    <SaveRow onCancel={onClose} onSave={save} label="Save" err={err}/>
+  </>;
+}
+function JobUpdateForm({onClose,prefillJob}){
+  const{data,update}=useApp();
+  const[jobId,setJobId]=useState(prefillJob||'');
+  const[showDone,setShowDone]=useState(false);
+  const job=data.jobs.find(j=>j.id===jobId);
+  if(!job){
+    const list=data.jobs.filter(j=>showDone||j.status!=='Completed');
+    return <>
+      <div className="muted" style={{marginBottom:10,fontSize:15}}>Which job?</div>
+      {list.length===0&&<div className="muted" style={{marginBottom:12}}>No active jobs.</div>}
+      {list.map(j=>{const c=custOf(data,j);return <div key={j.id} className="pick-row" onClick={()=>setJobId(j.id)}>
+        <div style={{minWidth:0}}><strong>{c?.name||'Unknown'}</strong><div className="muted" style={{fontSize:13}}>{[j.address?.city,j.systemSize||j.package].filter(Boolean).join(' · ')}</div></div>
+        <Pill className={statusColor(j.status)}>{j.status}</Pill>
+      </div>;})}
+      {!showDone&&data.jobs.some(j=>j.status==='Completed')&&<button className="btn btn-outline btn-full" style={{marginBottom:8}} onClick={()=>setShowDone(true)}>Show completed jobs too</button>}
+      <button className="btn btn-outline btn-full" onClick={onClose}>Cancel</button>
+    </>;
+  }
+  return <>
+    <div className="card-sm" style={{background:'var(--bg)'}}>
+      <strong>{custOf(data,job)?.name}</strong> <span className="muted">is now</span> <Pill className={statusColor(job.status)}>{job.status}</Pill>
+    </div>
+    <div className="muted" style={{fontSize:15,marginTop:8}}>Tap the new stage:</div>
+    <StatusButtons current={job.status} onPick={s=>{setJobStatus(update,job,s);onClose();}}/>
+    {!prefillJob&&<button className="btn btn-outline btn-full" style={{marginBottom:8}} onClick={()=>setJobId('')}>← Pick a different job</button>}
+    <button className="btn btn-outline btn-full" onClick={onClose}>Cancel</button>
+  </>;
+}
+function NewJobForm({onClose,prefillCustomer}){
+  const{data,update}=useApp();
+  const[mode,setMode]=useState(prefillCustomer?'existing':'new');
+  const[custId,setCustId]=useState(prefillCustomer||'');
+  const[cName,setCName]=useState('');
+  const[cPhone,setCPhone]=useState('');
+  const[status,setStatus]=useState('Inquiry');
+  const[lead,setLead]=useState('');
+  const[brgy,setBrgy]=useState('');
+  const[city,setCity]=useState('');
+  const[prov,setProv]=useState('Tarlac');
+  const[mapLink,setMapLink]=useState('');
+  const[pkgType,setPkgType]=useState('solar');
+  const[pkg,setPkg]=useState('');
+  const[size,setSize]=useState('');
+  const[price,setPrice]=useState('');
+  const[date,setDate]=useState('');
+  const[team,setTeam]=useState('');
+  const[sched,setSched]=useState('');
+  const[notes,setNotes]=useState('');
+  const[err,setErr]=useState('');
+  function save(){
+    if(mode==='new'&&!cName.trim())return setErr('Enter the customer name');
+    if(mode==='existing'&&!custId)return setErr('Pick the customer');
+    const p=parseFloat(price)||0;
+    if(status!=='Inquiry'&&p<=0)return setErr('Enter the agreed price');
+    const cid=mode==='new'?uid():custId;
+    const job={id:uid(),customerId:cid,address:{barangay:brgy,city,province:prov,mapLink},pkgType,package:pkg,systemSize:size,agreedPrice:p,
+      plannedDate:date,status,assignedTeam:team,notes,paymentSchedule:sched,leadSource:lead,createdAt:today()};
+    update(d=>({...d,
+      customers:mode==='new'?[...d.customers,{id:cid,name:cName.trim(),phone:cPhone.trim(),notes:''}]:d.customers,
+      jobs:[...d.jobs,job],
+      statusLog:[...d.statusLog,{id:uid(),jobId:job.id,from:'',to:status,date:today(),createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <Field label="Customer">
+      {data.customers.length>0&&<ChipSelect options={['new','existing']} value={mode} onChange={setMode} labels={{new:'New customer',existing:'Existing customer'}}/>}
+    </Field>
+    {mode==='existing'?<Field label="Pick customer" required>
+      <select value={custId} onChange={e=>setCustId(e.target.value)}>
+        <option value="">Select…</option>
+        {[...data.customers].sort((a,b)=>a.name.localeCompare(b.name)).map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
+      </select>
+    </Field>:<>
+      <Field label="Customer name" required><input value={cName} onChange={e=>setCName(e.target.value)} placeholder="e.g. Juan dela Cruz"/></Field>
+      <Field label="Phone"><input value={cPhone} onChange={e=>setCPhone(e.target.value)} placeholder="09xxxxxxxxx" type="tel"/></Field>
+    </>}
+    <Field label="Stage"><ChipSelect options={JOB_STATUSES} value={status} onChange={setStatus}/></Field>
+    <Field label="How did they find us?"><ChipSelect options={LEAD_SOURCES} value={lead} onChange={setLead}/></Field>
+    <div className="section-label">Job</div>
+    <Field label="Type of installation">
+      <ChipSelect options={['solar','lights','other']} value={pkgType} onChange={v=>{setPkgType(v);setSize('');}} labels={{solar:'☀️ Solar',lights:'💡 Lights',other:'Other'}}/>
+    </Field>
+    {pkgType==='solar'&&<Field label="System size">
+      <ChipSelect options={['1kW','2kW','3kW','5kW','8kW','10kW','12kW','15kW','20kW']} value={size} onChange={setSize}/>
+      <input style={{marginTop:8}} value={size} onChange={e=>setSize(e.target.value)} placeholder="or type custom size e.g. 6.5kW"/>
+    </Field>}
+    {pkgType==='lights'&&<Field label="Number of units"><input value={size} onChange={e=>setSize(e.target.value)} placeholder="e.g. 5 street lights, 10 flood lights"/></Field>}
+    <Field label="Package details"><input value={pkg} onChange={e=>setPkg(e.target.value)} placeholder={pkgType==='solar'?'e.g. hybrid, grid-tie, off-grid':pkgType==='lights'?'e.g. 500W IP67 flood lights':'Describe what they need'}/></Field>
+    <AmountInput label={status==='Inquiry'?'Agreed price (if known)':'Agreed price'} value={price} onChange={setPrice} required={status!=='Inquiry'}/>
+    <DateField label="Planned install date" value={date} onChange={setDate}/>
+    <Field label="Team"><input value={team} onChange={e=>setTeam(e.target.value)} placeholder="e.g. Joel's Team"/></Field>
+    <Field label="Payment schedule"><input value={sched} onChange={e=>setSched(e.target.value)} placeholder="e.g. 50% deposit, balance after install"/></Field>
+    <div className="section-label">Where</div>
+    <Field label="Barangay"><input value={brgy} onChange={e=>setBrgy(e.target.value)}/></Field>
+    <Field label="Town / City"><input value={city} onChange={e=>setCity(e.target.value)}/></Field>
+    <Field label="Province"><input value={prov} onChange={e=>setProv(e.target.value)}/></Field>
+    <Field label="Map link (optional)"><input value={mapLink} onChange={e=>setMapLink(e.target.value)} placeholder="https://maps.google.com/…"/></Field>
+    <Field label="Notes"><textarea value={notes} onChange={e=>setNotes(e.target.value)}/></Field>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Job" err={err}/>
+  </>;
+}
+function EditJobForm({onClose,jobId}){
+  const{data,update}=useApp();
+  const job=data.jobs.find(j=>j.id===jobId)||{address:{}};
+  const[f,setF]=useState({pkgType:job.pkgType||'solar',package:job.package||'',systemSize:job.systemSize||'',agreedPrice:String(job.agreedPrice||''),plannedDate:job.plannedDate||'',
+    assignedTeam:job.assignedTeam||'',paymentSchedule:job.paymentSchedule||'',leadSource:job.leadSource||'',notes:job.notes||'',
+    barangay:job.address?.barangay||'',city:job.address?.city||'',province:job.address?.province||'',mapLink:job.address?.mapLink||''});
+  const set=k=>e=>setF({...f,[k]:e.target?e.target.value:e});
+  function save(){
+    update(d=>({...d,jobs:d.jobs.map(j=>j.id===jobId?{...j,package:f.package,systemSize:f.systemSize,agreedPrice:parseFloat(f.agreedPrice)||0,
+      pkgType:f.pkgType,plannedDate:f.plannedDate,assignedTeam:f.assignedTeam,paymentSchedule:f.paymentSchedule,leadSource:f.leadSource,notes:f.notes,
+      address:{barangay:f.barangay,city:f.city,province:f.province,mapLink:f.mapLink}}:j)}));
+    onClose();
+  }
+  return <>
+    <Field label="Type of installation">
+      <ChipSelect options={['solar','lights','other']} value={f.pkgType} onChange={v=>setF({...f,pkgType:v,systemSize:''})} labels={{solar:'☀️ Solar',lights:'💡 Lights',other:'Other'}}/>
+    </Field>
+    {f.pkgType==='solar'&&<Field label="System size">
+      <ChipSelect options={['1kW','2kW','3kW','5kW','8kW','10kW','12kW','15kW','20kW']} value={f.systemSize} onChange={v=>setF({...f,systemSize:v})}/>
+      <input style={{marginTop:8}} value={f.systemSize} onChange={set('systemSize')} placeholder="or type custom size e.g. 6.5kW"/>
+    </Field>}
+    {f.pkgType==='lights'&&<Field label="Number of units"><input value={f.systemSize} onChange={set('systemSize')} placeholder="e.g. 5 street lights"/></Field>}
+    <Field label="Package details"><input value={f.package} onChange={set('package')} placeholder={f.pkgType==='solar'?'e.g. hybrid, grid-tie, off-grid':f.pkgType==='lights'?'e.g. 500W IP67 flood lights':'Describe what they need'}/></Field>
+    <AmountInput label="Agreed price" value={f.agreedPrice} onChange={set('agreedPrice')}/>
+    <DateField label="Planned install date" value={f.plannedDate} onChange={set('plannedDate')}/>
+    <Field label="Team"><input value={f.assignedTeam} onChange={set('assignedTeam')}/></Field>
+    <Field label="Payment schedule"><input value={f.paymentSchedule} onChange={set('paymentSchedule')}/></Field>
+    <Field label="How did they find us?"><ChipSelect options={LEAD_SOURCES} value={f.leadSource} onChange={set('leadSource')}/></Field>
+    <Field label="Barangay"><input value={f.barangay} onChange={set('barangay')}/></Field>
+    <Field label="Town / City"><input value={f.city} onChange={set('city')}/></Field>
+    <Field label="Province"><input value={f.province} onChange={set('province')}/></Field>
+    <Field label="Map link"><input value={f.mapLink} onChange={set('mapLink')}/></Field>
+    <Field label="Notes"><textarea value={f.notes} onChange={set('notes')}/></Field>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Changes"/>
+  </>;
+}
+function CustomerForm({onClose,customerId}){
+  const{data,update}=useApp();
+  const c=data.customers.find(x=>x.id===customerId);
+  const[name,setName]=useState(c?.name||'');
+  const[phone,setPhone]=useState(c?.phone||'');
+  const[notes,setNotes]=useState(c?.notes||'');
+  const[err,setErr]=useState('');
+  function save(){
+    if(!name.trim())return setErr('Enter a name');
+    if(c)update(d=>({...d,customers:d.customers.map(x=>x.id===c.id?{...x,name:name.trim(),phone:phone.trim(),notes}:x)}));
+    else update(d=>({...d,customers:[...d.customers,{id:uid(),name:name.trim(),phone:phone.trim(),notes,createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <Field label="Name" required><input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Brgy. San Jose (Capt. Reyes)"/></Field>
+    <Field label="Phone"><input value={phone} onChange={e=>setPhone(e.target.value)} type="tel" placeholder="09xxxxxxxxx"/></Field>
+    <Field label="Notes"><textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Anything to remember about them"/></Field>
+    <SaveRow onCancel={onClose} onSave={save} label={c?'Save Changes':'Add Customer'} err={err}/>
+  </>;
+}
+function FeeForm({onClose,jobId}){
+  const{update}=useApp();
+  const[desc,setDesc]=useState('');
+  const[owedTo,setOwedTo]=useState('');
+  const[amount,setAmount]=useState('');
+  const[paid,setPaid]=useState('no');
+  const[source,setSource]=useState('cash');
+  const[date,setDate]=useState(today());
+  const[err,setErr]=useState('');
+  function save(){
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much');
+    update(d=>({...d,feeRecords:[...d.feeRecords,{id:uid(),jobId,amount:amt,description:desc,owedTo,date,paid:paid==='yes',
+      paidSource:paid==='yes'?source:'',paidDate:paid==='yes'?date:'',createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <Field label="What fee?"><input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="e.g. Agent commission, permit"/></Field>
+    <Field label="Owed to (optional)"><input value={owedTo} onChange={e=>setOwedTo(e.target.value)}/></Field>
+    <AmountInput label="How much?" value={amount} onChange={setAmount} required/>
+    <Field label="Paid already?"><ChipSelect options={['no','yes']} value={paid} onChange={setPaid} labels={{no:'Not yet',yes:'Already paid'}}/></Field>
+    {paid==='yes'&&<Field label="Paid with"><ChipSelect options={PAYMENT_SOURCES} value={source} onChange={setSource} labels={SRC_LABEL}/></Field>}
+    <DateField value={date} onChange={setDate}/>
+    <SaveRow onCancel={onClose} onSave={save} label="Save Fee" err={err}/>
+  </>;
+}
+function FeePayForm({onClose,feeId}){
+  const{data,update}=useApp();
+  const fee=data.feeRecords.find(f=>f.id===feeId);
+  const[source,setSource]=useState('cash');
+  const[date,setDate]=useState(today());
+  if(!fee)return null;
+  function save(){
+    update(d=>({...d,feeRecords:d.feeRecords.map(f=>f.id===feeId?{...f,paid:true,paidSource:source,paidDate:date}:f)}));
+    onClose();
+  }
+  return <>
+    <div className="card-sm" style={{background:'var(--bg)'}}><strong>{peso(fee.amount)}</strong> <span className="muted">{fee.description}{fee.owedTo?' · '+fee.owedTo:''}</span></div>
+    <Field label="Paid with"><ChipSelect options={PAYMENT_SOURCES} value={source} onChange={setSource} labels={SRC_LABEL}/></Field>
+    <DateField value={date} onChange={setDate}/>
+    <SaveRow onCancel={onClose} onSave={save} label="Mark as Paid"/>
+  </>;
+}
+function FarmIncomeForm({onClose}){
+  const{data,update}=useApp();
+  const[desc,setDesc]=useState('');
+  const[amount,setAmount]=useState('');
+  const[source,setSource]=useState('cash');
+  const[date,setDate]=useState(today());
+  const[actId,setActId]=useState('');
+  const[err,setErr]=useState('');
+  function save(){
+    const amt=parseFloat(amount);
+    if(!amt||amt<=0)return setErr('Enter how much');
+    update(d=>({...d,farmIncome:[...d.farmIncome,{id:uid(),activityId:actId,amount:amt,description:desc,date,source,createdAt:nowISO()}]}));
+    onClose();
+  }
+  return <>
+    <AmountInput label="How much?" value={amount} onChange={setAmount} required/>
+    <Field label="What for?"><input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="e.g. Palay harvest sale"/></Field>
+    {data.farmActivities.length>0&&<Field label="Farm activity"><select value={actId} onChange={e=>setActId(e.target.value)}><option value="">General</option>{data.farmActivities.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></Field>}
+    <Field label="Received as"><ChipSelect options={PAYMENT_SOURCES} value={source} onChange={setSource} labels={SRC_LABEL}/></Field>
+    <DateField value={date} onChange={setDate}/>
+    <SaveRow onCancel={onClose} onSave={save} label="Save" err={err}/>
+  </>;
+}
+function FarmActivityForm({onClose}){
+  const{update}=useApp();
+  const[name,setName]=useState('');
+  const[type,setType]=useState('general');
+  const[date,setDate]=useState(today());
+  const[notes,setNotes]=useState('');
+  const[err,setErr]=useState('');
+  function save(){
+    if(!name.trim())return setErr('Enter a name');
+    update(d=>({...d,farmActivities:[...d.farmActivities,{id:uid(),name:name.trim(),type,startDate:date,endDate:null,notes,active:true}]}));
+    onClose();
+  }
+  return <>
+    <Field label="Activity name" required><input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Wet Season Palay 2026"/></Field>
+    <Field label="Type"><ChipSelect options={['general','crop_cycle','harvest','livestock']} value={type} onChange={setType} labels={{crop_cycle:'Crop cycle'}}/></Field>
+    <DateField label="Start date" value={date} onChange={setDate}/>
+    <Field label="Notes"><textarea value={notes} onChange={e=>setNotes(e.target.value)}/></Field>
+    <SaveRow onCancel={onClose} onSave={save} label="Create Activity" err={err}/>
+  </>;
+}
+function AddPersonForm({onClose}){
+  const{update}=useApp();
+  const[name,setName]=useState('');
+  const[role,setRole]=useState('');
+  const[notes,setNotes]=useState('');
+  const[err,setErr]=useState('');
+  function save(){
+    if(!name.trim())return setErr('Enter a name');
+    update(d=>({...d,people:[...d.people,{id:uid(),name:name.trim(),role,notes,active:true}]}));
+    onClose();
+  }
+  return <>
+    <Field label="Name" required><input value={name} onChange={e=>setName(e.target.value)}/></Field>
+    <Field label="Role"><input value={role} onChange={e=>setRole(e.target.value)} placeholder="e.g. Installer, Farm worker"/></Field>
+    <Field label="Notes"><textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Pay terms, contact…"/></Field>
+    <SaveRow onCancel={onClose} onSave={save} label="Add Person" err={err}/>
+  </>;
+}
+
+const LOG_TITLES={expense:'Add Expense',custpay:'Payment Received',advance:'Give Advance',advreturn:'Advance Cash Returned',payperson:'Pay a Person',
+  transfer:'Move Money',jobupdate:'Job Update',newjob:'New Job',editjob:'Edit Job',customer:'Customer',fee:'Add Fee',feepay:'Mark Fee Paid',
+  farmincome:'Farm Income',farmactivity:'New Farm Activity',addperson:'Add Person'};
+function LogModals({log,onClose}){
+  if(!log)return null;
+  const P={...log,onClose};
+  const F={expense:ExpenseForm,custpay:CustomerPaymentForm,advance:AdvanceForm,advreturn:AdvanceReturnForm,payperson:PayPersonForm,
+    transfer:TransferForm,jobupdate:JobUpdateForm,newjob:NewJobForm,editjob:EditJobForm,customer:CustomerForm,fee:FeeForm,feepay:FeePayForm,
+    farmincome:FarmIncomeForm,farmactivity:FarmActivityForm,addperson:AddPersonForm}[log.action];
+  if(!F)return null;
+  const title=log.action==='customer'?(log.customerId?'Edit Customer':'Add Customer'):LOG_TITLES[log.action];
+  return <Modal open onClose={onClose} title={title}><F {...P}/></Modal>;
+}
+
+// ─── Activity list with delete ────────────────────────────────
+function deleteRecord(update,data,item){
+  if(item.coll==='advances'){
+    const linked=data.expenses.some(e=>e.advanceId===item.id)||data.advanceReturns.some(r=>r.advanceId===item.id);
+    if(linked){alert('This advance has expenses or returns linked to it. Delete those first.');return;}
+  }
+  update(d=>({...d,[item.coll]:d[item.coll].filter(x=>x.id!==item.id)}));
+}
+function ActivityList({items,empty}){
+  const{data,update,canEdit}=useApp();
+  const[sel,setSel]=useState(null);
+  const[conf,setConf]=useState(false);
+  if(items.length===0)return <div className="muted" style={{padding:'8px 2px'}}>{empty||'Nothing logged yet.'}</div>;
+  return <>
+    <div className="card act-card">
+      {items.map(it=><div key={it.coll+it.id} className="act-row" onClick={()=>setSel(it)}>
+        <div className="act-icon">{it.icon}</div>
+        <div style={{flex:1,minWidth:0}}>
+          <div className="act-title">{it.title}</div>
+          <div className="muted act-sub">{fmtDate(it.date)}{it.sub?' · '+it.sub:''}</div>
+        </div>
+        {it.amount!=null&&<div className={'act-amt '+it.dir}>{it.dir==='in'?'+':it.dir==='out'?'−':''}{peso(it.amount)}</div>}
+      </div>)}
+    </div>
+    <Modal open={!!sel} onClose={()=>setSel(null)} title={sel?.title}>
+      {sel&&<>
+        {sel.amount!=null&&<div style={{fontSize:30,fontWeight:800,marginBottom:8}} className={'act-amt '+sel.dir}>{peso(sel.amount)}</div>}
+        <div className="summary-row"><span className="muted">Date</span><strong>{fmtDate(sel.date)}</strong></div>
+        {(sel.sub||'').split(' · ').filter(Boolean).map((s,i)=><div key={i} className="summary-row"><span>{s}</span></div>)}
+        {canEdit&&sel.coll!=='equipmentPurchases'&&<>
+          <div className="muted" style={{margin:'16px 0 8px'}}>Made a mistake? Delete it and log it again.</div>
+          <button className="btn btn-danger btn-full" onClick={()=>setConf(true)}>🗑 Delete this entry</button>
+        </>}
+        <button className="btn btn-outline btn-full" style={{marginTop:8}} onClick={()=>setSel(null)}>Close</button>
+      </>}
+    </Modal>
+    <Confirm open={conf} danger message="Delete this entry? This can't be undone." confirmLabel="Delete"
+      onCancel={()=>setConf(false)} onConfirm={()=>{deleteRecord(update,data,sel);setConf(false);setSel(null);}}/>
+  </>;
+}
+
+// ─── Sync badge ───────────────────────────────────────────────
+function SyncBadge(){
+  const{device,sync,pullNow,pushNow,goMorePage}=useApp();
+  if(!device.syncUrl){
+    return <div className="sync-badge plain" onClick={()=>goMorePage('sync')} style={{cursor:'pointer'}}>
+      <span>📵 Saved on this phone only. Tap to connect Google Sheet.</span>
+    </div>;
+  }
+  if(device.role==='viewer'){
+    return <div className="sync-badge info">
+      <div>👀 View only<div style={{fontWeight:400,fontSize:13}}>{device.remoteSavedAt?'Dad last saved '+fmtStamp(device.remoteSavedAt):'Not loaded yet'}</div>
+        {sync.state==='error'&&<div className="sb-err">Couldn't refresh: {sync.msg}</div>}</div>
+      <button className="btn btn-sm btn-outline" onClick={pullNow} disabled={sync.state==='pulling'}>{sync.state==='pulling'?'Loading…':'Refresh'}</button>
+    </div>;
+  }
+  if(sync.state==='sending')return <div className="sync-badge info"><span>⟳ Sending to Google Sheet…</span></div>;
+  if(device.pending)return <div className="sync-badge warn">
+    <div>⏳ Not sent yet<div style={{fontWeight:400,fontSize:13}}>Will send when there is internet</div></div>
+    <button className="btn btn-sm btn-outline" onClick={pushNow}>Send now</button>
+  </div>;
+  return <div className="sync-badge ok"><span>✓ Saved to Google Sheet{device.lastSent?' · '+fmtStamp(device.lastSent):''}</span></div>;
+}
+
+// ─── Home ─────────────────────────────────────────────────────
+const BIG_ACTIONS=[
+  {action:'expense',icon:'💸',label:'Expense',bg:'#dc2626'},
+  {action:'custpay',icon:'💰',label:'Payment received',bg:'#059669'},
+  {action:'advance',icon:'🤝',label:'Give advance',bg:'#d97706'},
+  {action:'jobupdate',icon:'🔧',label:'Job update',bg:'#2563eb'},
+];
+function HomeTab(){
+  const{data,canEdit,openLog,openJob}=useApp();
+  const b=useMemo(()=>computeBalances(data),[data]);
+  const acts=useMemo(()=>buildActivity(data),[data]);
+  const[show,setShow]=useState(8);
+  const s=data.settings;
+  const openAdv=data.advances.filter(a=>a.status==='open');
+  const held=advHeld(data);
+  const over=sum(openAdv,a=>Math.max(0,-advanceUnsettled(a,data.expenses,data.advanceReturns)));
+  const owed=owedTotal(data);
+  const month=today().slice(0,7);
+  const inMonth=x=>(x||'').startsWith(month);
+  const monthIn=sum(data.customerPayments.filter(p=>inMonth(p.date)),p=>p.amount)+sum(data.farmIncome.filter(i=>inMonth(i.date)),i=>i.amount);
+  const monthOut=sum(data.expenses.filter(e=>inMonth(e.date)&&e.paymentSource!=='advance'),e=>e.amount)+sum(data.personPayments.filter(p=>inMonth(p.date)),p=>p.amount)
+    +sum(data.feeRecords.filter(f=>f.paid&&inMonth(f.paidDate)),f=>f.amount)+sum(data.advances.filter(a=>inMonth(a.date)),a=>a.amount)-sum(data.advanceReturns.filter(r=>inMonth(r.date)),r=>r.amount);
+  const activeJobs=data.jobs.filter(j=>j.status!=='Completed'&&j.status!=='Inquiry');
+  const attention=[];
+  openAdv.forEach(a=>{
+    const u=advanceUnsettled(a,data.expenses,data.advanceReturns);const n=personName(data,a.personId);
+    if(u>0)attention.push({color:'var(--warning)',text:`${n} still has ${peso(u)} of an advance`,go:()=>canEdit&&openLog('advreturn',{prefillAdvance:a.id})});
+    if(u<0)attention.push({color:'var(--danger)',text:`${n} overspent an advance by ${peso(-u)}`,go:()=>canEdit&&openLog('advreturn',{prefillAdvance:a.id})});
+  });
+  data.jobs.filter(j=>j.status==='Completed').forEach(j=>{
+    const bal=jobBalance(j,data.customerPayments);
+    if(bal>0)attention.push({color:'var(--danger)',text:`${custOf(data,j)?.name}: finished but still owes ${peso(bal)}`,go:()=>openJob(j.id)});
+  });
+  data.feeRecords.filter(f=>!f.paid).forEach(f=>{
+    const j=data.jobs.find(x=>x.id===f.jobId);
+    attention.push({color:'var(--warning)',text:`Unpaid fee ${peso(f.amount)}${f.description?' ('+f.description+')':''}${j?' · '+custOf(data,j)?.name:''}`,go:()=>j&&openJob(j.id)});
+  });
+  const dateLabel=new Date().toLocaleDateString('en-PH',{timeZone:'Asia/Manila',weekday:'long',month:'long',day:'numeric'});
+  return <div className="screen">
+    <h1>Sunwicck ☀️</h1>
+    <div className="muted">{dateLabel}</div>
+    <SyncBadge/>
+    {canEdit&&<>
+      <div className="big-grid">
+        {BIG_ACTIONS.map(a=><button key={a.action} className="big-btn" style={{background:a.bg}} onClick={()=>openLog(a.action)}>
+          <span className="big-icon">{a.icon}</span><span>{a.label}</span>
+        </button>)}
+      </div>
+      <div className="small-actions">
+        <button className="small-btn" onClick={()=>openLog('payperson')}><span>👤</span><span>Pay a person</span></button>
+        <button className="small-btn" onClick={()=>openLog('advreturn')}><span>↩️</span><span>Advance returned</span></button>
+        <button className="small-btn" onClick={()=>openLog('transfer')}><span>🔁</span><span>Move money</span></button>
+      </div>
+    </>}
+    <div className="section-label">Money now</div>
+    <div className="balance-grid">
+      <div className="balance-card"><div className="balance-label">Cash</div><div className="balance-amount">{peso(b.cash)}</div></div>
+      <div className="balance-card"><div className="balance-label">Bank</div><div className="balance-amount">{peso(b.bank)}</div></div>
+      <div className="balance-card"><div className="balance-label">GCash</div><div className="balance-amount">{peso(b.gcash)}</div></div>
+    </div>
+    <div className="card">
+      <div className="summary-row"><span>Total money</span><strong style={{fontSize:18}}>{fmtUSD(b.total,s)}</strong></div>
+      <div className="summary-row"><span>Customers still owe</span><strong style={{color:'var(--danger)'}}>{peso(owed)}</strong></div>
+      <div className="summary-row"><span>Advance money with workers</span><strong style={{color:'var(--warning)'}}>{peso(held)}</strong></div>
+      {over>0&&<div className="summary-row"><span>Overspent advances</span><strong style={{color:'var(--danger)'}}>{peso(over)}</strong></div>}
+    </div>
+    <div className="section-label">This month</div>
+    <div className="card">
+      <div className="summary-row"><span>💰 Money in</span><strong style={{color:'var(--success)'}}>{peso(monthIn)}</strong></div>
+      <div className="summary-row"><span>💸 Money out</span><strong style={{color:'var(--danger)'}}>{peso(monthOut)}</strong></div>
+      <div className="summary-row"><span>🔧 Jobs in progress</span><strong>{activeJobs.length}</strong></div>
+    </div>
+    {attention.length>0&&<>
+      <div className="section-label">⚠️ Needs attention</div>
+      {attention.map((n,i)=><div key={i} className="alert-item" onClick={n.go}><div className="alert-dot" style={{background:n.color}}/><span>{n.text}</span></div>)}
+    </>}
+    <div className="section-label">Recent activity</div>
+    <ActivityList items={acts.slice(0,show)}/>
+    {acts.length>show&&<button className="btn btn-outline btn-full" onClick={()=>setShow(show+15)}>Show more</button>}
+  </div>;
+}
+
+// ─── Jobs ─────────────────────────────────────────────────────
+function JobCard({job,onClick}){
+  const{data}=useApp();
+  const c=custOf(data,job);
+  const paid=paidForJob(job,data.customerPayments);
+  const bal=(job.agreedPrice||0)-paid;
+  const ps=jobPaymentStatus(job,data.customerPayments);
+  return <div className="job-card" onClick={onClick}>
+    <div className="row" style={{marginBottom:6,alignItems:'flex-start'}}>
+      <div style={{minWidth:0}}><div style={{fontWeight:800,fontSize:17}}>{c?.name||'Unknown'}</div>
+        <div className="muted" style={{fontSize:13}}>{[job.address?.city,job.address?.province].filter(Boolean).join(', ')||'No address'}</div></div>
+      <Pill className={statusColor(job.status)}>{STATUS_META[job.status]?.icon} {job.status}</Pill>
+    </div>
+    <div className="row"><span style={{fontSize:14}}>{job.package||job.systemSize||'—'}</span><span style={{fontWeight:800,fontSize:17}}>{peso(job.agreedPrice)}</span></div>
+    {job.status!=='Inquiry'&&<>
+      <div className="row" style={{marginTop:6}}><Pill className={payStatusColor(ps)}>{ps}</Pill>{bal>0&&<span className="muted" style={{fontSize:13}}>{peso(bal)} owed</span>}</div>
+      <div className="progress"><div className="progress-fill" style={{width:jobPct(job,data.customerPayments)+'%'}}/></div>
+    </>}
+  </div>;
+}
+function JobsTab(){
+  const{data,canEdit,openLog,jobDetail,openJob}=useApp();
+  const[filter,setFilter]=useState('Active');
+  if(jobDetail)return <JobDetail jobId={jobDetail} onBack={()=>openJob(null)}/>;
+  const filtered=data.jobs.filter(j=>filter==='All'||(filter==='Active'?j.status!=='Completed':j.status===filter))
+    .sort((a,b)=>JOB_STATUSES.indexOf(b.status)-JOB_STATUSES.indexOf(a.status));
+  return <div className="screen">
+    <div className="row" style={{marginBottom:12}}>
+      <h2 style={{marginBottom:0}}>Jobs</h2>
+      {canEdit&&<button className="btn btn-primary btn-sm" onClick={()=>openLog('newjob')}>+ New job</button>}
+    </div>
+    <div style={{overflowX:'auto',paddingBottom:4,marginBottom:12}}>
+      <div style={{display:'flex',gap:8,minWidth:'max-content'}}>
+        {['Active',...JOB_STATUSES,'All'].map(s=><button key={s} className={`chip${filter===s?' selected':''}`} onClick={()=>setFilter(s)}>{s} ({s==='All'?data.jobs.length:s==='Active'?data.jobs.filter(j=>j.status!=='Completed').length:data.jobs.filter(j=>j.status===s).length})</button>)}
+      </div>
+    </div>
+    {filtered.length===0&&<div className="empty-state"><div className="empty-icon">📋</div><p>No jobs here.</p></div>}
+    {filtered.map(j=><JobCard key={j.id} job={j} onClick={()=>openJob(j.id)}/>)}
+  </div>;
+}
+function JobDetail({jobId,onBack}){
+  const{data,update,canEdit,openLog,openCustomer}=useApp();
+  const[allocModal,setAllocModal]=useState(false);
+  const[allocInvId,setAllocInvId]=useState('');
+  const[allocQty,setAllocQty]=useState('');
+  const[allocErr,setAllocErr]=useState('');
+  const job=data.jobs.find(j=>j.id===jobId);
+  if(!job)return <div className="screen"><button className="btn btn-outline" onClick={onBack}>← Back</button><p style={{marginTop:16}}>This job was removed.</p></div>;
+  const customer=custOf(data,job);
+  const payments=data.customerPayments.filter(p=>p.jobId===jobId);
+  const ps=jobPaymentStatus(job,data.customerPayments);
+  const m=jobMargin(job,data);
+  const jobExp=data.expenses.filter(e=>e.jobId===jobId);
+  const jobAdv=data.advances.filter(a=>a.jobId===jobId);
+  const equip=data.jobEquipment.filter(e=>e.jobId===jobId);
+  const fees=data.feeRecords.filter(f=>f.jobId===jobId);
+  const history=data.statusLog.filter(s=>s.jobId===jobId).slice().reverse();
+  const usedOf=id=>sum(data.jobEquipment.filter(je=>je.inventoryItemId===id),je=>je.quantity);
+  function allocateEquip(){
+    setAllocErr('');
+    if(!allocInvId)return setAllocErr('Pick an item');
+    const qty=parseInt(allocQty);
+    if(!qty||qty<=0)return setAllocErr('Enter how many');
+    const inv=data.inventory.find(i=>i.id===allocInvId);
+    if(!inv)return;
+    const avail=inv.quantity-usedOf(allocInvId);
+    if(qty>avail)return setAllocErr(`Only ${avail} available`);
+    update(d=>({...d,jobEquipment:[...d.jobEquipment,{id:uid(),jobId,inventoryItemId:allocInvId,description:`${inv.description} × ${qty}`,quantity:qty,unitCost:inv.unitCost||0,totalCost:qty*(inv.unitCost||0),date:today()}]}));
+    setAllocModal(false);setAllocInvId('');setAllocQty('');
+  }
+  function removeAlloc(je){
+    if(!window.confirm(`Remove "${je.description}" from this job? It goes back to free stock.`))return;
+    update(d=>({...d,jobEquipment:d.jobEquipment.filter(x=>x.id!==je.id)}));
+  }
+  const addr=[job.address?.barangay,job.address?.city,job.address?.province].filter(Boolean).join(', ');
+  return <>
+    <DetailHeader onBack={onBack} title={customer?.name||'Job'} sub={job.package||job.systemSize}
+      right={canEdit&&<button className="btn btn-sm btn-outline" onClick={()=>openLog('editjob',{jobId})}>Edit</button>}/>
+    <div className="screen">
+      <div className="card">
+        <div className="row"><strong>Stage</strong><Pill className={statusColor(job.status)}>{STATUS_META[job.status]?.icon} {job.status}</Pill></div>
+        {canEdit&&<><div className="muted" style={{marginTop:8}}>Tap to change:</div><StatusButtons current={job.status} onPick={s=>setJobStatus(update,job,s)}/></>}
+      </div>
+      <div className="card">
+        <div className="row" style={{alignItems:'flex-start'}}>
+          <div style={{minWidth:0}}>
+            <div style={{fontWeight:800,fontSize:17,cursor:'pointer',color:'var(--info)'}} onClick={()=>customer&&openCustomer(customer.id)}>{customer?.name} ›</div>
+            <div className="muted">{addr||'No address'}</div>
+            {job.address?.mapLink&&<a href={job.address.mapLink} target="_blank" rel="noopener" style={{fontSize:14}}>📍 Open map</a>}
+          </div>
+          {customer?.phone&&<a className="call-btn" href={'tel:'+customer.phone}>📞 Call</a>}
+        </div>
+      </div>
+      <div className="card">
+        <div className="row" style={{marginBottom:4}}><strong>Customer payments</strong>
+          {canEdit&&<button className="btn btn-sm btn-secondary" onClick={()=>openLog('custpay',{prefillJob:jobId})}>+ Payment</button>}</div>
+        <div className="summary-row"><span className="muted">Agreed price</span><strong>{peso(job.agreedPrice)}</strong></div>
+        <div className="summary-row"><span className="muted">Received</span><strong style={{color:'var(--success)'}}>{peso(m.paid)}</strong></div>
+        <div className="summary-row"><span className="muted">Still owes</span><strong style={{color:m.price-m.paid>0?'var(--danger)':'var(--success)'}}>{peso(m.price-m.paid)}</strong></div>
+        <div style={{marginTop:6}}><Pill className={payStatusColor(ps)}>{ps}</Pill></div>
+        {payments.map(p=><div key={p.id} className="history-item">
+          <div className="history-dot" style={{background:'var(--success)'}}/>
+          <div style={{flex:1}}><strong>{peso(p.amount)}</strong> <span className="muted">{SRC_LABEL[p.source]}</span>
+            <div className="muted" style={{fontSize:13}}>{fmtDate(p.date)}{p.notes&&` · ${p.notes}`}</div></div>
+        </div>)}
+      </div>
+      <div className="card">
+        <strong>Details</strong>
+        <div className="summary-row"><span className="muted">Package</span><span>{job.package||'—'}</span></div>
+        <div className="summary-row"><span className="muted">System size</span><span>{job.systemSize||'—'}</span></div>
+        <div className="summary-row"><span className="muted">Install date</span><span>{fmtDate(job.plannedDate)||'—'}</span></div>
+        <div className="summary-row"><span className="muted">Team</span><span>{job.assignedTeam||'—'}</span></div>
+        <div className="summary-row"><span className="muted">Payment plan</span><span style={{fontSize:14,textAlign:'right'}}>{job.paymentSchedule||'—'}</span></div>
+        <div className="summary-row"><span className="muted">Found us via</span><span>{job.leadSource||'—'}</span></div>
+        {job.notes&&<div style={{marginTop:8,fontSize:14,color:'var(--text2)'}}>{job.notes}</div>}
+      </div>
+      <div className="card">
+        <div className="row" style={{marginBottom:4}}><strong>Expenses</strong>
+          {canEdit&&<button className="btn btn-sm btn-secondary" onClick={()=>openLog('expense',{prefillJob:jobId})}>+ Expense</button>}</div>
+        {jobExp.length===0&&<div className="muted">None yet.</div>}
+        {jobExp.map(e=><div key={e.id} className="history-item">
+          <div className="history-dot" style={{background:e.paymentSource==='advance'?'var(--info)':'var(--warning)'}}/>
+          <div style={{flex:1}}>
+            <div className="row"><span style={{fontWeight:700,fontSize:14}}>{peso(e.amount)} · {e.category}</span><span className="muted" style={{fontSize:12}}>{e.paymentSource==='advance'?'from advance':SRC_LABEL[e.paymentSource]}</span></div>
+            <div className="muted" style={{fontSize:13}}>{fmtDate(e.date)}{e.description&&` · ${e.description}`}</div></div>
+        </div>)}
+        <div className="summary-row" style={{marginTop:6}}><span className="muted">Total</span><strong>{peso(m.directExp)}</strong></div>
+      </div>
+      {jobAdv.length>0&&<div className="card">
+        <strong>Advances for this job</strong>
+        {jobAdv.map(a=>{
+          const spent=sum(data.expenses.filter(e=>e.advanceId===a.id),e=>e.amount);
+          const ret=sum(data.advanceReturns.filter(r=>r.advanceId===a.id),r=>r.amount);
+          const u=a.amount-spent-ret;const n=personName(data,a.personId);
+          return <div key={a.id} style={{marginTop:12,padding:12,background:'var(--bg)',borderRadius:10}}>
+            <div className="row"><strong>{n}</strong><Pill className={a.status==='settled'?'pill-success':'pill-warning'}>{a.status==='settled'?'Closed':'Open'}</Pill></div>
+            <div className="summary-row"><span className="muted">Given</span><span>{peso(a.amount)}</span></div>
+            <div className="summary-row"><span className="muted">Spent (logged)</span><span>{peso(spent)}</span></div>
+            <div className="summary-row"><span className="muted">Returned</span><span>{peso(ret)}</span></div>
+            <div className="summary-row"><span className="muted">{u>=0?'Still with '+n:'Overspent by'}</span><strong style={{color:u>0?'var(--warning)':u<0?'var(--danger)':'var(--success)'}}>{peso(Math.abs(u))}</strong></div>
+            {canEdit&&a.status==='open'&&<button className="btn btn-sm btn-outline btn-full" style={{marginTop:8}} onClick={()=>openLog('advreturn',{prefillAdvance:a.id})}>Record return / close</button>}
+          </div>;
+        })}
+      </div>}
+      <div className="card">
+        <div className="row" style={{marginBottom:4}}><strong>Equipment used</strong>
+          {canEdit&&<button className="btn btn-sm btn-secondary" onClick={()=>{setAllocInvId('');setAllocQty('');setAllocErr('');setAllocModal(true);}}>+ From stock</button>}</div>
+        {equip.length===0&&<div className="muted">None assigned yet.</div>}
+        {equip.map(e=><div key={e.id} className="history-item">
+          <div className="history-dot" style={{background:'var(--primary)'}}/>
+          <div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{e.description}</div>
+            <div className="muted" style={{fontSize:13}}>Cost {peso(e.totalCost)}</div></div>
+          {canEdit&&e.inventoryItemId&&<button className="btn btn-sm btn-outline" style={{minHeight:34,padding:'4px 10px'}} onClick={()=>removeAlloc(e)}>✕</button>}
+        </div>)}
+        <div className="summary-row" style={{marginTop:6}}><span className="muted">Total</span><strong>{peso(m.equipCost)}</strong></div>
+      </div>
+      <div className="card">
+        <div className="row" style={{marginBottom:4}}><strong>Fees</strong>
+          {canEdit&&<button className="btn btn-sm btn-secondary" onClick={()=>openLog('fee',{jobId})}>+ Fee</button>}</div>
+        {fees.length===0&&<div className="muted">No fees.</div>}
+        {fees.map(f=><div key={f.id} className="history-item">
+          <div className="history-dot" style={{background:f.paid?'var(--success)':'var(--warning)'}}/>
+          <div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{peso(f.amount)} · {f.description||'Fee'}</div>
+            <div className="muted" style={{fontSize:13}}>{f.owedTo?f.owedTo+' · ':''}{f.paid?'Paid '+fmtDate(f.paidDate)+' ('+SRC_LABEL[f.paidSource]+')':'Not paid yet'}</div></div>
+          {canEdit&&!f.paid&&<button className="btn btn-sm btn-outline" onClick={()=>openLog('feepay',{feeId:f.id})}>Mark paid</button>}
+        </div>)}
+      </div>
+      <div className="margin-card">
+        <div className="row" style={{marginBottom:8}}><strong>Profit estimate</strong>{job.status!=='Completed'&&<Pill className="pill-warning">Not final</Pill>}</div>
+        <div className="summary-row"><span className="muted">Price</span><strong>{peso(m.price)}</strong></div>
+        <div className="summary-row"><span className="muted">Equipment</span><span>−{peso(m.equipCost)}</span></div>
+        <div className="summary-row"><span className="muted">Expenses</span><span>−{peso(m.directExp)}</span></div>
+        <div className="summary-row"><span className="muted">Team pay</span><span>−{peso(m.teamPaid)}</span></div>
+        <div className="summary-row"><span className="muted">Fees (paid + unpaid)</span><span>−{peso(m.feesPaid+m.feesOwed)}</span></div>
+        <hr className="divider"/>
+        <div className="summary-row"><strong>Profit</strong><strong style={{fontSize:18,color:m.marginOnPrice>=0?'var(--success)':'var(--danger)'}}>{peso(m.marginOnPrice)}</strong></div>
+      </div>
+      {history.length>0&&<div className="card">
+        <strong>Stage history</strong>
+        {history.map(h=><div key={h.id} className="history-item"><div className="history-dot"/><div><strong>{h.to}</strong> <span className="muted">{fmtDate(h.date)}</span></div></div>)}
+      </div>}
+    </div>
+    <Modal open={allocModal} onClose={()=>setAllocModal(false)} title="Use Equipment from Stock">
+      {(()=>{
+        const sel=data.inventory.find(i=>i.id===allocInvId);
+        const avail=sel?sel.quantity-usedOf(sel.id):0;
+        return <>
+          <Field label="Item" required>
+            <select value={allocInvId} onChange={e=>{setAllocInvId(e.target.value);setAllocQty('');}}>
+              <option value="">Select from stock…</option>
+              {data.inventory.map(item=>{const a=item.quantity-usedOf(item.id);
+                return <option key={item.id} value={item.id} disabled={a<=0}>{item.description} ({a>0?a+' free':'none free'})</option>;})}
+            </select>
+          </Field>
+          {sel&&<div className="card-sm" style={{background:'var(--info-bg)'}}>In stock {sel.quantity} · Used {sel.quantity-avail} · <strong>Free {avail}</strong></div>}
+          <Field label="How many?" required><input type="number" inputMode="numeric" value={allocQty} onChange={e=>setAllocQty(e.target.value)} placeholder="0" min="1"/></Field>
+          <SaveRow onCancel={()=>setAllocModal(false)} onSave={allocateEquip} label="Assign to Job" err={allocErr}/>
+        </>;
+      })()}
+    </Modal>
+  </>;
+}
+
+// ─── Customers ────────────────────────────────────────────────
+function CustomersTab(){
+  const{data,canEdit,openLog,custDetail,openCustomer}=useApp();
+  const[q,setQ]=useState('');
+  if(custDetail)return <CustomerDetail customerId={custDetail} onBack={()=>openCustomer(null)}/>;
+  const list=data.customers.filter(c=>!q||(c.name+' '+(c.phone||'')).toLowerCase().includes(q.toLowerCase()))
+    .map(c=>{const js=data.jobs.filter(j=>j.customerId===c.id);const owed=sum(js.filter(j=>j.status!=='Inquiry'),j=>Math.max(0,jobBalance(j,data.customerPayments)));return{c,js,owed};})
+    .sort((a,b)=>b.owed-a.owed||a.c.name.localeCompare(b.c.name));
+  return <div className="screen">
+    <div className="row" style={{marginBottom:12}}>
+      <h2 style={{marginBottom:0}}>Customers</h2>
+      {canEdit&&<button className="btn btn-primary btn-sm" onClick={()=>openLog('customer')}>+ Add</button>}
+    </div>
+    <input value={q} onChange={e=>setQ(e.target.value)} placeholder="🔍 Search name or phone" style={{marginBottom:12}}/>
+    {list.length===0&&<div className="empty-state"><div className="empty-icon">📇</div><p>No customers{q?' match':' yet'}.</p></div>}
+    {list.map(({c,js,owed})=><div key={c.id} className="job-card" onClick={()=>openCustomer(c.id)}>
+      <div className="row">
+        <div style={{minWidth:0}}><div style={{fontWeight:800,fontSize:17}}>{c.name}</div>
+          <div className="muted" style={{fontSize:13}}>{c.phone||'No phone'} · {js.length} job{js.length===1?'':'s'}</div></div>
+        {owed>0?<div style={{textAlign:'right'}}><div className="muted" style={{fontSize:12}}>Owes</div><strong style={{color:'var(--danger)'}}>{peso(owed)}</strong></div>
+          :<Pill className="pill-success">Paid up</Pill>}
+      </div>
+    </div>)}
+  </div>;
+}
+function CustomerDetail({customerId,onBack}){
+  const{data,canEdit,openLog,openJob}=useApp();
+  const c=data.customers.find(x=>x.id===customerId);
+  if(!c)return <div className="screen"><button className="btn btn-outline" onClick={onBack}>← Back</button></div>;
+  const js=data.jobs.filter(j=>j.customerId===c.id);
+  const agreed=sum(js,j=>j.agreedPrice||0);
+  const paid=sum(js,j=>paidForJob(j,data.customerPayments));
+  const acts=buildActivity(data).filter(a=>a.coll==='customerPayments'&&js.some(j=>data.customerPayments.find(p=>p.id===a.id)?.jobId===j.id));
+  return <>
+    <DetailHeader onBack={onBack} title={c.name} sub={c.phone}
+      right={canEdit&&<button className="btn btn-sm btn-outline" onClick={()=>openLog('customer',{customerId:c.id})}>Edit</button>}/>
+    <div className="screen">
+      {c.phone&&<a className="call-btn" href={'tel:'+c.phone} style={{marginBottom:12,width:'100%',justifyContent:'center'}}>📞 Call {c.phone}</a>}
+      {c.notes&&<div className="card-sm" style={{background:'var(--warning-bg)'}}>{c.notes}</div>}
+      <div className="card">
+        <div className="summary-row"><span className="muted">Total agreed</span><strong>{peso(agreed)}</strong></div>
+        <div className="summary-row"><span className="muted">Paid</span><strong style={{color:'var(--success)'}}>{peso(paid)}</strong></div>
+        <div className="summary-row"><span className="muted">Still owes</span><strong style={{color:agreed-paid>0?'var(--danger)':'var(--success)'}}>{peso(agreed-paid)}</strong></div>
+      </div>
+      <div className="row" style={{margin:'20px 0 8px'}}>
+        <div className="section-label" style={{margin:0}}>Jobs</div>
+        {canEdit&&<button className="btn btn-sm btn-secondary" onClick={()=>openLog('newjob',{prefillCustomer:c.id})}>+ New job</button>}
+      </div>
+      {js.length===0&&<div className="muted">No jobs yet.</div>}
+      {js.map(j=><JobCard key={j.id} job={j} onClick={()=>openJob(j.id)}/>)}
+      <div className="section-label">Payments</div>
+      <ActivityList items={acts} empty="No payments yet."/>
+    </div>
+  </>;
+}
+
+// ─── Inventory ────────────────────────────────────────────────
+const TYPE_MAP={'Panels':'panel','Inverters':'inverter','Batteries':'battery'};
+const CAT_ICON={'Panels':'🔆','Inverters':'⚡','Batteries':'🔋','Accessories':'🔧','Breakers':'🔌','Mounting':'🏗️','Connectors':'🔗','Cables':'📟','Hose':'🌀','Lighting':'💡','Pumps':'💧','Irrigation':'🌊','Other':'📦'};
+const ALL_CATS=Object.keys(CAT_ICON);
+async function sheetsFetch(url,key){
+  const q=new URLSearchParams({action:'read',t:Date.now(),...(key?{key}:{})});
+  const res=await fetch(url+'?'+q.toString());
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const j=await res.json();
+  if(!j.ok)throw new Error(j.error||'Sheets error');
+  return j;
+}
+async function pullFromSheets(scriptUrl,update,key){
+  const j=await sheetsFetch(scriptUrl,key);
+  const items=j.items||[];
+  update(d=>{
+    const byCode={};d.inventory.forEach(i=>{byCode[i.code||i.id]=i;});
+    const fromSheet=items.map(s=>{const old=byCode[s.code]||{};
+      return{...old,id:old.id||s.code,code:s.code,category:s.category||'Other',type:TYPE_MAP[s.category]||'other',description:s.description,
+        unit:s.unit||'pc',quantity:s.quantity,unitCost:s.unitCost||0,notes:s.notes||'',purchaseId:old.purchaseId||null};});
+    const codes=new Set(items.map(s=>s.code));
+    const keep=d.inventory.filter(i=>!codes.has(i.code||i.id)&&d.jobEquipment.some(je=>je.inventoryItemId===i.id));
+    return{...d,inventory:[...fromSheet,...keep],settings:{...d.settings,lastSheetsSync:nowISO(),inventoryTab:j.tab||''}};
+  });
+  return{count:items.length,tab:j.tab};
+}
+const pushAllToSheets=(url,inv,key)=>postJSON(url,{action:'syncAll',items:inv},key);
+const pushItemToSheets=(url,item,key)=>postJSON(url,{action:'update',code:item.code||item.id,category:item.category,description:item.description,unit:item.unit||'pc',quantity:item.quantity,unitCost:item.unitCost,notes:item.notes||''},key);
+
+function InventoryTab(){
+  const{data,update,canEdit,device,goMorePage}=useApp();
+  const blank={category:'Accessories',code:'',description:'',quantity:'',unitCost:'',unit:'pc',purchaseId:'',notes:''};
+  const[addModal,setAddModal]=useState(false);
+  const[editItem,setEditItem]=useState(null);
+  const[form,setForm]=useState(blank);
+  const[search,setSearch]=useState('');
+  const[catFilter,setCatFilter]=useState('All');
+  const[syncStatus,setSyncStatus]=useState(null);
+  const[syncMsg,setSyncMsg]=useState('');
+  const inv=data.inventory;
+  const scriptUrl=device.syncUrl||'';
+  const syncKey=device.syncKey||'';
+  const syncEnabled=!!scriptUrl;
+  useEffect(()=>{if(syncEnabled&&canEdit)doSync('pull');},[]);
+  async function doSync(mode){
+    setSyncStatus('syncing');setSyncMsg(mode==='pull'?'Getting stock from the sheet…':'Sending stock to the sheet…');
+    try{
+      if(mode==='pull'){const r=await pullFromSheets(scriptUrl,update,syncKey);setSyncStatus('ok');setSyncMsg(`✓ Got ${r.count} items from the ${r.tab||''} tab`);}
+      else{const r=await pushAllToSheets(scriptUrl,inv,syncKey);setSyncStatus('ok');setSyncMsg(`✓ ${r.count} item${r.count===1?'':'s'} updated in the ${r.tab||''} tab`);update(d=>({...d,settings:{...d.settings,lastSheetsSync:nowISO()}}));}
+    }catch(err){setSyncStatus('error');setSyncMsg('Could not reach the sheet: '+err.message);}
+    setTimeout(()=>setSyncStatus(s=>s==='ok'?null:s),4000);
+  }
+  function pushAll(){
+    if(!window.confirm("Send this phone's stock counts to this month's tab? Differences are added as Stock In / Stock Out. Tap \"Get from sheet\" first if Laura changed the sheet today."))return;
+    doSync('push');
+  }
+  const usedQty=id=>sum(data.jobEquipment.filter(je=>je.inventoryItemId===id),je=>je.quantity);
+  function saveItem(){
+    if(!form.description.trim()||form.quantity==='')return;
+    const resolved={...form,type:TYPE_MAP[form.category]||'other',quantity:parseInt(form.quantity)||0,unitCost:parseFloat(form.unitCost||0)};
+    let saved;
+    if(editItem){const old=inv.find(i=>i.id===editItem);saved={...old,...resolved};update(d=>({...d,inventory:d.inventory.map(i=>i.id===editItem?saved:i)}));setEditItem(null);}
+    else{saved={id:form.code||uid(),...resolved,createdAt:nowISO()};update(d=>({...d,inventory:[...d.inventory,saved]}));}
+    setAddModal(false);setForm(blank);
+    if(syncEnabled&&saved)pushItemToSheets(scriptUrl,saved,syncKey).then(()=>setSyncMsg('✓ Sheet updated')).catch(e=>{setSyncStatus('error');setSyncMsg('Sheet update failed: '+e.message);});
+  }
+  function openEdit(item){setForm({category:item.category||'Other',code:item.code||'',description:item.description,quantity:String(item.quantity),unitCost:String(item.unitCost||''),unit:item.unit||'pc',purchaseId:item.purchaseId||'',notes:item.notes||''});setEditItem(item.id);setAddModal(true);}
+  const totalItems=sum(inv,i=>i.quantity);
+  const allocated=sum(inv,i=>usedQty(i.id));
+  const categories=[...new Set(inv.map(i=>i.category||'Other'))].sort((a,b)=>ALL_CATS.indexOf(a)-ALL_CATS.indexOf(b));
+  const filtered=inv.filter(i=>(catFilter==='All'||(i.category||'Other')===catFilter)&&(!search||(i.description+' '+(i.code||'')).toLowerCase().includes(search.toLowerCase())));
+  const groups=catFilter==='All'?categories:[catFilter];
+  return <>
+    <DetailHeader title="Inventory" sub={`${inv.length} items · ${totalItems.toLocaleString()} units · ${allocated} in jobs`}
+      right={canEdit&&<button className="btn btn-primary btn-sm" onClick={()=>{setEditItem(null);setForm(blank);setAddModal(true);}}>+ Add</button>}/>
+    {syncStatus&&<div style={{background:syncStatus==='ok'?'var(--success-bg)':syncStatus==='error'?'var(--danger-bg)':'var(--primary-light)',color:syncStatus==='ok'?'var(--success)':syncStatus==='error'?'var(--danger)':'var(--primary-dark)',padding:'8px 16px',fontSize:14,fontWeight:600,flexShrink:0}}>
+      {syncStatus==='syncing'&&<span style={{display:'inline-block',animation:'spin 1s linear infinite',marginRight:6}}>⟳</span>}{syncMsg}
+    </div>}
+    <div className="screen">
+      {canEdit&&(syncEnabled?
+        <div className="card" style={{background:'var(--success-bg)',border:'1px solid var(--success)'}}>
+          <div style={{fontWeight:700,color:'var(--success)',marginBottom:8}}>🔗 Linked to INVENTORY LIST{data.settings.inventoryTab?' · '+data.settings.inventoryTab+' tab':''}</div>
+          <div style={{display:'flex',gap:6}}>
+            <button className="btn btn-sm btn-outline" style={{flex:1}} onClick={()=>doSync('pull')} disabled={syncStatus==='syncing'}>↓ Get from sheet</button>
+            <button className="btn btn-sm btn-outline" style={{flex:1}} onClick={pushAll} disabled={syncStatus==='syncing'}>↑ Send counts</button>
+          </div>
+          <div className="muted" style={{fontSize:12,marginTop:6}}>{data.settings.lastSheetsSync?'Last synced '+fmtStamp(data.settings.lastSheetsSync):'Not synced yet'}</div>
+        </div>:
+        <div className="card" style={{borderStyle:'dashed'}}>
+          <div className="row"><div><div style={{fontWeight:700}}>📊 Connect INVENTORY LIST</div><div className="muted" style={{fontSize:13}}>Uses the same link as Google Sheet sync</div></div>
+            <button className="btn btn-primary btn-sm" onClick={()=>goMorePage('sync')}>Set up</button></div>
+        </div>)}
+      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search items or codes" style={{marginBottom:10}}/>
+      <div style={{overflowX:'auto',paddingBottom:4,marginBottom:8}}>
+        <div style={{display:'flex',gap:6,minWidth:'max-content'}}>
+          {['All',...categories].map(c=><button key={c} className={`chip${catFilter===c?' selected':''}`} style={{fontSize:14,padding:'8px 12px'}} onClick={()=>setCatFilter(c)}>{c==='All'?'All':(CAT_ICON[c]||'📦')+' '+c}</button>)}
+        </div>
+      </div>
+      {groups.map(cat=>{
+        const items=filtered.filter(i=>(i.category||'Other')===cat);
+        if(items.length===0)return null;
+        return <div key={cat}>
+          <div className="section-label">{CAT_ICON[cat]||'📦'} {cat} ({items.length})</div>
+          {items.map(item=>{
+            const used=usedQty(item.id);const free=item.quantity-used;
+            return <div key={item.id} className="card-sm">
+              <div className="row" style={{alignItems:'flex-start'}}>
+                <div style={{flex:1,minWidth:0}}>
+                  {item.code&&<div style={{fontSize:12,fontWeight:700,color:'var(--text3)',fontFamily:'monospace'}}>{item.code}</div>}
+                  <strong style={{fontSize:15}}>{item.description}</strong>
+                  <div className="muted" style={{fontSize:12}}>Unit: {item.unit||'pc'}{item.unitCost>0?` · ${peso(item.unitCost)} each`:''}</div>
+                </div>
+                {canEdit&&<button className="btn btn-sm btn-outline" style={{minHeight:34,padding:'4px 10px'}} onClick={()=>openEdit(item)}>Edit</button>}
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:6,marginTop:8}}>
+                <div style={{textAlign:'center',padding:'6px 4px',background:'var(--bg)',borderRadius:8}}><div style={{fontSize:11,color:'var(--text2)'}}>Stock</div><div style={{fontWeight:800,fontSize:18}}>{item.quantity}</div></div>
+                <div style={{textAlign:'center',padding:'6px 4px',background:'var(--primary-light)',borderRadius:8}}><div style={{fontSize:11,color:'var(--text2)'}}>In jobs</div><div style={{fontWeight:800,fontSize:18,color:'var(--primary-dark)'}}>{used}</div></div>
+                <div style={{textAlign:'center',padding:'6px 4px',background:free>0?'var(--success-bg)':free===0?'var(--warning-bg)':'var(--danger-bg)',borderRadius:8}}><div style={{fontSize:11,color:'var(--text2)'}}>Free</div><div style={{fontWeight:800,fontSize:18,color:free>0?'var(--success)':free===0?'var(--warning)':'var(--danger)'}}>{free}</div></div>
+              </div>
+              {item.notes&&<div className="muted" style={{fontSize:12,marginTop:6,fontStyle:'italic'}}>⚠ {item.notes}</div>}
+            </div>;
+          })}
+        </div>;
+      })}
+      {filtered.length===0&&<div className="empty-state"><div className="empty-icon">🔍</div><p>No items match.</p></div>}
+    </div>
+    <Modal open={addModal} onClose={()=>setAddModal(false)} title={editItem?'Edit Item':'Add Item'}>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+        <Field label="Code"><input value={form.code} onChange={e=>setForm({...form,code:e.target.value})} placeholder="INV-XXX"/></Field>
+        <Field label="Unit"><input value={form.unit} onChange={e=>setForm({...form,unit:e.target.value})} placeholder="pc"/></Field>
+      </div>
+      <Field label="Category"><select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}>{ALL_CATS.map(c=><option key={c} value={c}>{CAT_ICON[c]} {c}</option>)}</select></Field>
+      <Field label="Description" required><input value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/></Field>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+        <Field label="Qty in stock" required><input type="number" inputMode="numeric" value={form.quantity} onChange={e=>setForm({...form,quantity:e.target.value})}/></Field>
+        <Field label="Cost each (₱)"><input type="number" inputMode="decimal" value={form.unitCost} onChange={e=>setForm({...form,unitCost:e.target.value})}/></Field>
+      </div>
+      <Field label="Notes"><input value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></Field>
+      <SaveRow onCancel={()=>setAddModal(false)} onSave={saveItem} label={editItem?'Save Changes':'Add Item'}/>
+    </Modal>
+  </>;
+}
+
+// ─── More pages ───────────────────────────────────────────────
+function PeoplePage(){
+  const{data,canEdit,openLog}=useApp();
+  const[detail,setDetail]=useState(null);
+  if(detail)return <PersonDetail personId={detail} onBack={()=>setDetail(null)}/>;
+  return <>
+    {canEdit&&<button className="btn btn-primary btn-full" style={{marginBottom:12}} onClick={()=>openLog('addperson')}>+ Add person</button>}
+    {data.people.map(p=>{
+      const paid=sum(data.personPayments.filter(x=>x.personId===p.id),x=>x.amount);
+      const held=sum(data.advances.filter(a=>a.personId===p.id&&a.status==='open'),a=>Math.max(0,advanceUnsettled(a,data.expenses,data.advanceReturns)));
+      return <div key={p.id} className="job-card" onClick={()=>setDetail(p.id)}>
+        <div className="row">
+          <div><div style={{fontWeight:800}}>{p.name}</div><div className="muted" style={{fontSize:13}}>{p.role}</div></div>
+          <div style={{textAlign:'right'}}>
+            {paid>0&&<div style={{fontSize:14,fontWeight:700,color:'var(--success)'}}>{peso(paid)} paid</div>}
+            {held>0&&<Pill className="pill-warning">{peso(held)} advance</Pill>}
+          </div>
+        </div>
+      </div>;
+    })}
+  </>;
+}
+function PersonDetail({personId,onBack}){
+  const{data,update,canEdit,openLog}=useApp();
+  const p=data.people.find(x=>x.id===personId);
+  const[editing,setEditing]=useState(false);
+  const[f,setF]=useState({name:p?.name||'',role:p?.role||'',notes:p?.notes||''});
+  if(!p)return null;
+  const acts=buildActivity(data).filter(a=>(a.coll==='personPayments'&&data.personPayments.find(x=>x.id===a.id)?.personId===personId)||
+    (a.coll==='advances'&&data.advances.find(x=>x.id===a.id)?.personId===personId)||
+    (a.coll==='advanceReturns'&&data.advances.find(x=>x.id===data.advanceReturns.find(r=>r.id===a.id)?.advanceId)?.personId===personId));
+  const totalPaid=sum(data.personPayments.filter(x=>x.personId===personId),x=>x.amount);
+  const held=sum(data.advances.filter(a=>a.personId===personId&&a.status==='open'),a=>advanceUnsettled(a,data.expenses,data.advanceReturns));
+  function save(){update(d=>({...d,people:d.people.map(x=>x.id===personId?{...x,...f}:x)}));setEditing(false);}
+  return <>
+    <div className="row" style={{marginBottom:12}}>
+      <button className="btn btn-sm btn-outline" onClick={onBack}>← All people</button>
+      {canEdit&&<button className="btn btn-sm btn-outline" onClick={()=>setEditing(true)}>Edit</button>}
+    </div>
+    <h2 style={{marginBottom:0}}>{p.name}</h2>
+    <div className="muted" style={{marginBottom:12}}>{p.role}</div>
+    {p.notes&&<div className="card-sm" style={{background:'var(--warning-bg)'}}>{p.notes}</div>}
+    <div className="card">
+      <div className="summary-row"><span className="muted">Total paid</span><strong>{peso(totalPaid)}</strong></div>
+      <div className="summary-row"><span className="muted">Advance money held now</span><strong style={{color:held>0?'var(--warning)':held<0?'var(--danger)':'var(--success)'}}>{peso(held)}</strong></div>
+    </div>
+    {canEdit&&<div className="btn-row" style={{marginTop:0,marginBottom:12}}>
+      <button className="btn btn-secondary btn-full" onClick={()=>openLog('payperson',{prefillPerson:p.id})}>Pay</button>
+      <button className="btn btn-secondary btn-full" onClick={()=>openLog('advance',{prefillPerson:p.id})}>Give advance</button>
+    </div>}
+    <div className="section-label">History</div>
+    <ActivityList items={acts} empty="Nothing yet."/>
+    <Modal open={editing} onClose={()=>setEditing(false)} title={'Edit '+p.name}>
+      <Field label="Name"><input value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></Field>
+      <Field label="Role"><input value={f.role} onChange={e=>setF({...f,role:e.target.value})}/></Field>
+      <Field label="Notes"><textarea value={f.notes} onChange={e=>setF({...f,notes:e.target.value})}/></Field>
+      <SaveRow onCancel={()=>setEditing(false)} onSave={save}/>
+    </Modal>
+  </>;
+}
+function FarmPage(){
+  const{data,canEdit,openLog}=useApp();
+  const acts=buildActivity(data).filter(a=>a.coll==='farmIncome'||(a.coll==='expenses'&&data.expenses.find(e=>e.id===a.id)?.business==='farm'));
+  const farmExp=data.expenses.filter(e=>e.business==='farm');
+  const inc=sum(data.farmIncome,i=>i.amount);const exp=sum(farmExp,e=>e.amount);
+  return <>
+    {canEdit&&<div className="btn-row" style={{marginTop:0,marginBottom:12}}>
+      <button className="btn btn-secondary btn-full" onClick={()=>openLog('farmincome')}>+ Income</button>
+      <button className="btn btn-secondary btn-full" onClick={()=>openLog('expense',{prefillBusiness:'farm'})}>+ Expense</button>
+    </div>}
+    <div className="card">
+      <div className="summary-row"><span>Income</span><strong style={{color:'var(--success)'}}>{peso(inc)}</strong></div>
+      <div className="summary-row"><span>Expenses</span><strong style={{color:'var(--danger)'}}>{peso(exp)}</strong></div>
+      <div className="summary-row"><span>Net</span><strong>{peso(inc-exp)}</strong></div>
+    </div>
+    <div className="row" style={{margin:'20px 0 8px'}}>
+      <div className="section-label" style={{margin:0}}>Activities</div>
+      {canEdit&&<button className="btn btn-sm btn-outline" onClick={()=>openLog('farmactivity')}>+ Activity</button>}
+    </div>
+    {data.farmActivities.length===0&&<div className="muted">None yet.</div>}
+    {data.farmActivities.map(a=><div key={a.id} className="card-sm">
+      <div className="row"><strong>{a.name}</strong><Pill className={a.active?'pill-success':'pill-neutral'}>{a.active?'Active':'Ended'}</Pill></div>
+      <div className="row" style={{marginTop:6}}>
+        <span className="muted">In {peso(sum(data.farmIncome.filter(i=>i.activityId===a.id),i=>i.amount))}</span>
+        <span className="muted">Out {peso(sum(farmExp.filter(e=>e.farmActivityId===a.id),e=>e.amount))}</span>
+      </div>
+    </div>)}
+    <div className="section-label">Farm history</div>
+    <ActivityList items={acts} empty="No farm entries yet."/>
+  </>;
+}
+function AllRecordsPage(){
+  const{data}=useApp();
+  const all=useMemo(()=>buildActivity(data),[data]);
+  const[f,setF]=useState('All');
+  const[show,setShow]=useState(40);
+  const FILTERS={'All':()=>true,'Money in':a=>a.dir==='in','Money out':a=>a.dir==='out','Expenses':a=>a.coll==='expenses','Advances':a=>a.coll==='advances'||a.coll==='advanceReturns','Job updates':a=>a.coll==='statusLog'};
+  const items=all.filter(FILTERS[f]);
+  return <>
+    <div style={{overflowX:'auto',paddingBottom:4,marginBottom:12}}>
+      <div style={{display:'flex',gap:8,minWidth:'max-content'}}>{Object.keys(FILTERS).map(k=><button key={k} className={`chip${f===k?' selected':''}`} onClick={()=>setF(k)}>{k}</button>)}</div>
+    </div>
+    <ActivityList items={items.slice(0,show)}/>
+    {items.length>show&&<button className="btn btn-outline btn-full" onClick={()=>setShow(show+40)}>Show more</button>}
+  </>;
+}
+function ChinaPage(){
+  const{data,update,canEdit}=useApp();
+  const[open,setOpen]=useState(false);
+  const blank={supplier:'',purchaseDate:today(),originalCurrency:'USD',originalAmount:'',phpCost:'',exchangeRate:'',shippingCost:'',importCost:'',items:'',amountPaid:'',paymentSource:'bank',status:'Ordered',notes:''};
+  const[eq,setEq]=useState(blank);
+  const n=v=>parseFloat(v)||0;
+  function save(){
+    const landed=n(eq.phpCost)+n(eq.shippingCost)+n(eq.importCost);
+    const items=eq.items?eq.items.split('\n').map(s=>({description:s.trim(),quantity:1})).filter(i=>i.description):[];
+    update(d=>({...d,equipmentPurchases:[...d.equipmentPurchases,{id:uid(),supplier:eq.supplier,purchaseDate:eq.purchaseDate,originalCurrency:eq.originalCurrency,originalAmount:n(eq.originalAmount),phpCost:n(eq.phpCost),exchangeRate:n(eq.exchangeRate)||null,exchangeRateDate:eq.purchaseDate,shippingCost:n(eq.shippingCost),importCost:n(eq.importCost),items,totalLandedCost:landed,amountPaid:n(eq.amountPaid),paymentSource:eq.paymentSource,status:eq.status,notes:eq.notes,createdAt:nowISO()}]}));
+    setOpen(false);setEq(blank);
+  }
+  function setStatus(id,status){update(d=>({...d,equipmentPurchases:d.equipmentPurchases.map(p=>p.id===id?{...p,status}:p)}));}
+  return <>
+    {canEdit&&<button className="btn btn-primary btn-full" style={{marginBottom:12}} onClick={()=>setOpen(true)}>+ Record China order</button>}
+    {data.equipmentPurchases.length===0&&<div className="muted">No orders yet.</div>}
+    {data.equipmentPurchases.map(ep=><div key={ep.id} className="card">
+      <div className="row"><strong>{ep.supplier}</strong><Pill className={ep.status==='Received'?'pill-success':'pill-warning'}>{ep.status}</Pill></div>
+      <div className="muted" style={{fontSize:13}}>{fmtDate(ep.purchaseDate)} · {ep.originalCurrency} {(ep.originalAmount||0).toLocaleString()}{ep.exchangeRate?' @ ₱'+ep.exchangeRate:''}</div>
+      <div className="summary-row"><span className="muted">Landed cost</span><strong>{peso(ep.totalLandedCost)}</strong></div>
+      <div className="summary-row"><span className="muted">Paid</span><span>{peso(ep.amountPaid)} ({SRC_LABEL[ep.paymentSource]})</span></div>
+      {ep.amountPaid<ep.totalLandedCost&&<Pill className="pill-warning">{peso(ep.totalLandedCost-ep.amountPaid)} not yet paid</Pill>}
+      {canEdit&&ep.status!=='Received'&&<button className="btn btn-sm btn-outline btn-full" style={{marginTop:8}} onClick={()=>setStatus(ep.id,'Received')}>Mark received</button>}
+    </div>)}
+    <Modal open={open} onClose={()=>setOpen(false)} title="China Order">
+      <Field label="Supplier"><input value={eq.supplier} onChange={e=>setEq({...eq,supplier:e.target.value})}/></Field>
+      <DateField label="Order date" value={eq.purchaseDate} onChange={v=>setEq({...eq,purchaseDate:v})}/>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+        <Field label="Currency"><select value={eq.originalCurrency} onChange={e=>setEq({...eq,originalCurrency:e.target.value})}><option>USD</option><option>CNY</option><option>PHP</option></select></Field>
+        <Field label="Amount"><input type="number" value={eq.originalAmount} onChange={e=>setEq({...eq,originalAmount:e.target.value})}/></Field>
+        <Field label="Cost in ₱"><input type="number" value={eq.phpCost} onChange={e=>setEq({...eq,phpCost:e.target.value})}/></Field>
+        <Field label="Rate used"><input type="number" value={eq.exchangeRate} onChange={e=>setEq({...eq,exchangeRate:e.target.value})}/></Field>
+        <Field label="Shipping ₱"><input type="number" value={eq.shippingCost} onChange={e=>setEq({...eq,shippingCost:e.target.value})}/></Field>
+        <Field label="Import/customs ₱"><input type="number" value={eq.importCost} onChange={e=>setEq({...eq,importCost:e.target.value})}/></Field>
+      </div>
+      <Field label="Items (one per line)"><textarea value={eq.items} onChange={e=>setEq({...eq,items:e.target.value})}/></Field>
+      <AmountInput label="Paid to supplier so far" value={eq.amountPaid} onChange={v=>setEq({...eq,amountPaid:v})}/>
+      <Field label="Paid with"><ChipSelect options={PAYMENT_SOURCES} value={eq.paymentSource} onChange={v=>setEq({...eq,paymentSource:v})} labels={SRC_LABEL}/></Field>
+      <Field label="Status"><ChipSelect options={['Ordered','Received']} value={eq.status} onChange={v=>setEq({...eq,status:v})}/></Field>
+      <Field label="Notes"><textarea value={eq.notes} onChange={e=>setEq({...eq,notes:e.target.value})}/></Field>
+      {eq.phpCost&&<div className="card-sm" style={{background:'var(--info-bg)'}}>Landed cost: <strong>{peso(n(eq.phpCost)+n(eq.shippingCost)+n(eq.importCost))}</strong></div>}
+      <SaveRow onCancel={()=>setOpen(false)} onSave={save} label="Save Order"/>
+    </Modal>
+  </>;
+}
+function SyncPage(){
+  const{device,setDevice,sync,pushNow,pullNow}=useApp();
+  const[url,setUrl]=useState(device.syncUrl||'');
+  const[key,setKey]=useState(device.syncKey||'');
+  const[test,setTest]=useState('');
+  const[confirmViewer,setConfirmViewer]=useState(false);
+  async function doTest(){
+    setTest('Testing…');
+    try{await getJSON(url.trim(),{action:'ping'},key.trim());setTest('✓ Connected');}catch(e){setTest('✗ '+e.message);}
+  }
+  function saveUrl(){
+    setDevice({syncUrl:url.trim(),syncKey:key.trim()});
+    setTimeout(()=>{if(device.role==='viewer')pullNow();else pushNow();},200);
+  }
+  function chooseRole(r){
+    if(r===device.role)return;
+    if(r==='viewer')return setConfirmViewer(true);
+    setDevice({role:'main',pending:true});
+  }
+  return <>
+    <div className="section-label" style={{marginTop:0}}>What is this phone for?</div>
+    <div className={'role-opt'+(device.role==='main'?' on':'')} onClick={()=>chooseRole('main')}>
+      <span style={{fontSize:28}}>✍️</span>
+      <div><strong>Logs entries</strong><div className="muted">Dad's phone. Everything entered here is sent to the Google Sheet automatically.</div></div>
+    </div>
+    <div className={'role-opt'+(device.role==='viewer'?' on':'')} onClick={()=>chooseRole('viewer')}>
+      <span style={{fontSize:28}}>👀</span>
+      <div><strong>View only</strong><div className="muted">Your phone. Loads Dad's latest entries from the sheet. No editing, so nothing gets overwritten.</div></div>
+    </div>
+    <div className="section-label">Google Sheet link</div>
+    <div className="card">
+      <Field label="Sync link (web app URL)">
+        <input value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://script.google.com/macros/s/…/exec" style={{fontSize:13}}/>
+      </Field>
+      <Field label="Secret key" hint="Must match the SECRET_KEY in SunwiccSync.gs. Share this with Dad — both phones need the same key.">
+        <input value={key} onChange={e=>setKey(e.target.value)} placeholder="e.g. sunwicck2024" type="password"/>
+      </Field>
+      {test&&<div className="muted" style={{marginBottom:8,fontWeight:600}}>{test}</div>}
+      <div className="btn-row" style={{marginTop:0}}>
+        <button className="btn btn-outline btn-full" onClick={doTest} disabled={!url.trim()}>Test</button>
+        <button className="btn btn-primary btn-full" onClick={saveUrl} disabled={!url.trim()}>Save</button>
+      </div>
+    </div>
+    {device.syncUrl&&<div className="card">
+      {device.role==='main'?<>
+        <div className="summary-row"><span className="muted">Last sent</span><strong>{device.lastSent?fmtStamp(device.lastSent):'Never'}</strong></div>
+        <div className="summary-row"><span className="muted">Waiting to send</span><strong>{device.pending?'Yes':'No'}</strong></div>
+        {sync.state==='error'&&<div className="form-error">{sync.msg}</div>}
+        <button className="btn btn-secondary btn-full" style={{marginTop:10}} onClick={pushNow}>Send now</button>
+      </>:<>
+        <div className="summary-row"><span className="muted">Dad last saved</span><strong>{device.remoteSavedAt?fmtStamp(device.remoteSavedAt):'—'}</strong></div>
+        <div className="summary-row"><span className="muted">Loaded here</span><strong>{device.lastPulled?fmtStamp(device.lastPulled):'Never'}</strong></div>
+        {sync.state==='error'&&<div className="form-error">{sync.msg}</div>}
+        <button className="btn btn-secondary btn-full" style={{marginTop:10}} onClick={pullNow}>Refresh now</button>
+      </>}
+    </div>}
+    <div className="section-label">One-time setup</div>
+    <div className="card">
+      <ol className="steps">
+        <li>Open INVENTORY LIST.xlsx in Google Drive. File → Save as Google Sheets. From now on, everyone (Laura too) uses that new Google Sheet, not the .xlsx.</li>
+        <li>In the new sheet: Extensions → Apps Script. Delete what's there, paste in SunwicckSync.gs, Save.</li>
+        <li>Deploy → New deployment → type Web app. Execute as: Me. Who has access: Anyone. Approve the permissions.</li>
+        <li>Copy the Web app URL. Paste it above on Dad's phone (Logs entries) and on yours (View only).</li>
+      </ol>
+      <div className="muted" style={{marginTop:8,fontSize:13}}>The month tabs stay as they are. The app adds App Summary, App Activity, App Jobs, App Customers and App People tabs at the end, so you can check everything from the sheet too.</div>
+    </div>
+    <Confirm open={confirmViewer} message="Switch to View only? This phone's own entries will be replaced by Dad's data from the sheet." confirmLabel="Switch"
+      onCancel={()=>setConfirmViewer(false)} onConfirm={()=>{setConfirmViewer(false);setDevice({role:'viewer',pending:false});setTimeout(pullNow,200);}}/>
+  </>;
+}
+function SettingsPage(){
+  const{data,update,canEdit}=useApp();
+  const s=data.settings;
+  const[f,setF]=useState({cash:s.cashBalance,bank:s.bankBalance,gcash:s.gcashBalance,usdRate:s.usdRate,usdDate:s.usdRateDate||''});
+  const[saved,setSaved]=useState(false);
+  const[vName,setVName]=useState('');
+  function save(){
+    update(d=>({...d,settings:{...d.settings,cashBalance:parseFloat(f.cash)||0,bankBalance:parseFloat(f.bank)||0,gcashBalance:parseFloat(f.gcash)||0,usdRate:parseFloat(f.usdRate)||d.settings.usdRate,usdRateDate:f.usdDate}}));
+    setSaved(true);setTimeout(()=>setSaved(false),2500);
+  }
+  function addVehicle(){if(!vName.trim())return;update(d=>({...d,vehicles:[...d.vehicles,{id:uid(),name:vName.trim(),plate:''}]}));setVName('');}
+  return <>
+    <div className="card">
+      <div className="toggle-row">
+        <div><strong>Show US$ next to total</strong><div className="muted" style={{fontSize:13}}>For reference only</div></div>
+        <label className="toggle"><input type="checkbox" checked={!!s.showUSD} disabled={!canEdit} onChange={()=>update(d=>({...d,settings:{...d.settings,showUSD:!d.settings.showUSD}}))}/><span className="toggle-slider"/></label>
+      </div>
+    </div>
+    <div className="section-label">Starting balances</div>
+    <div className="card">
+      <div className="muted" style={{marginBottom:12,fontSize:14}}>How much was in each account on the day you started using this app.</div>
+      <AmountInput label="Cash" value={f.cash} onChange={v=>setF({...f,cash:v})}/>
+      <AmountInput label="Bank" value={f.bank} onChange={v=>setF({...f,bank:v})}/>
+      <AmountInput label="GCash" value={f.gcash} onChange={v=>setF({...f,gcash:v})}/>
+      <div className="section-label">Exchange rate</div>
+      <Field label="₱ per US$1"><input type="number" value={f.usdRate} onChange={e=>setF({...f,usdRate:e.target.value})}/></Field>
+      <DateField label="Rate date" value={f.usdDate} onChange={v=>setF({...f,usdDate:v})}/>
+      {canEdit&&<button className="btn btn-primary btn-full" onClick={save}>{saved?'✓ Saved':'Save'}</button>}
+    </div>
+    <div className="section-label">Vehicles</div>
+    <div className="card">
+      {data.vehicles.map(v=><div key={v.id} className="summary-row"><span>🚛 {v.name}</span><span className="muted">{data.expenses.filter(e=>e.vehicleId===v.id).length} entries</span></div>)}
+      {canEdit&&<div style={{display:'flex',gap:8,marginTop:10}}><input value={vName} onChange={e=>setVName(e.target.value)} placeholder="Add a vehicle"/><button className="btn btn-secondary" onClick={addVehicle}>Add</button></div>}
+    </div>
+  </>;
+}
+function BackupPage(){
+  const{data,update,canEdit}=useApp();
+  const[erase,setErase]=useState(false);
+  const[demo,setDemo]=useState(false);
+  const[restore,setRestore]=useState(null);
+  function download(content,type,name){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+  function exportCSV(){
+    const rows=[['Date','What','Details','Money in','Money out']].concat(buildActivity(data).map(a=>[a.date,a.title,a.sub,a.dir==='in'?a.amount:'',a.dir==='out'?a.amount:'']));
+    download(rows.map(r=>r.map(x=>'"'+(x==null?'':String(x)).replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv','sunwicck_'+today()+'.csv');
+  }
+  function exportJSON(){download(JSON.stringify(data,null,2),'application/json','sunwicck_backup_'+today()+'.json');}
+  function pickFile(){
+    const inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';
+    inp.onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();
+      r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.jobs)return alert('That is not a Sunwicck backup file.');setRestore(d);}catch{alert('Could not read the file.');}};r.readAsText(file);};
+    inp.click();
+  }
+  return <>
+    <div className="card">
+      <button className="btn btn-outline btn-full" onClick={exportCSV}>📊 Download all records (CSV)</button>
+      <button className="btn btn-outline btn-full" style={{marginTop:8}} onClick={exportJSON}>💾 Download full backup</button>
+      {canEdit&&<button className="btn btn-outline btn-full" style={{marginTop:8}} onClick={pickFile}>📂 Restore from backup</button>}
+    </div>
+    {canEdit&&<>
+      <div className="section-label">Danger zone</div>
+      <div className="card">
+        <div className="muted" style={{fontSize:14,marginBottom:10}}>Start fresh: removes all jobs, customers, payments and expenses. Keeps the inventory list, people and vehicles. Download a backup first.</div>
+        <button className="btn btn-danger btn-full" onClick={()=>setErase(true)}>Erase all entries</button>
+        <button className="btn btn-danger btn-full" style={{marginTop:8}} onClick={()=>setDemo(true)}>Load demo data</button>
+      </div>
+    </>}
+    <TypedConfirm open={erase} word="ERASE" message="Erase every entry on this phone?" onCancel={()=>setErase(false)} onConfirm={()=>{update(d=>makeCleanData(d));setErase(false);}}/>
+    <TypedConfirm open={demo} word="DEMO" message="Replace everything with demo data?" onCancel={()=>setDemo(false)} onConfirm={()=>{update(()=>makeDemoData());setDemo(false);}}/>
+    <Confirm open={!!restore} message="Replace everything on this phone with the backup file?" confirmLabel="Restore" danger
+      onCancel={()=>setRestore(null)} onConfirm={()=>{update(()=>migrate(restore));setRestore(null);}}/>
+  </>;
+}
+const MORE_PAGES=[
+  {id:'people',icon:'👥',label:'People',hint:'Workers, pay and advances',C:PeoplePage},
+  {id:'farm',icon:'🌿',label:'Farm',hint:'Farm income and expenses',C:FarmPage},
+  {id:'records',icon:'📒',label:'All records',hint:'Every entry, newest first',C:AllRecordsPage},
+  {id:'china',icon:'🚢',label:'China orders',hint:'Equipment purchases and landed cost',C:ChinaPage},
+  {id:'sync',icon:'🔗',label:'Google Sheet sync',hint:'Dad logs, you view',C:SyncPage},
+  {id:'settings',icon:'⚙️',label:'Balances & settings',hint:'Starting money, vehicles, US$',C:SettingsPage},
+  {id:'backup',icon:'💾',label:'Backup & reset',hint:'Download, restore, start fresh',C:BackupPage},
+];
+function MoreTab(){
+  const{morePage,goMorePage}=useApp();
+  const page=MORE_PAGES.find(p=>p.id===morePage);
+  if(page){const C=page.C;return <><DetailHeader title={page.label} onBack={()=>goMorePage(null)}/><div className="screen"><C/></div></>;}
+  return <div className="screen">
+    <h2>More</h2>
+    <div className="card" style={{padding:'0 14px'}}>
+      {MORE_PAGES.map(p=><div key={p.id} className="menu-row" onClick={()=>goMorePage(p.id)}>
+        <div className="menu-icon">{p.icon}</div>
+        <div style={{flex:1}}><div style={{fontWeight:700,fontSize:17}}>{p.label}</div><div className="muted" style={{fontSize:13}}>{p.hint}</div></div>
+        <span style={{color:'var(--text3)',fontSize:22}}>›</span>
+      </div>)}
+    </div>
+  </div>;
+}
+
+// ─── App ──────────────────────────────────────────────────────
+function App(){
+  const[data,setData]=useState(()=>loadData());
+  const[device,setDeviceState]=useState(()=>loadDevice());
+  const[tab,setTab]=useState('home');
+  const[log,setLog]=useState(null);
+  const[jobDetail,setJobDetail]=useState(null);
+  const[custDetail,setCustDetail]=useState(null);
+  const[morePage,setMorePage]=useState(null);
+  const[sync,setSync]=useState({state:'idle',msg:''});
+  const dataRef=useRef(data);dataRef.current=data;
+  const deviceRef=useRef(device);deviceRef.current=device;
+  const firstRun=useRef(true);
+  const timer=useRef(null);
+  const isViewer=device.role==='viewer';
+  function setDevice(patch){setDeviceState(p=>{const n={...p,...patch};saveDevice(n);deviceRef.current=n;return n;});}
+  function update(fn){
+    if(deviceRef.current.role==='viewer')return;
+    setData(prev=>{const next=migrate(typeof fn==='function'?fn(prev):fn);saveData(next);return next;});
+  }
+  async function pushNow(){
+    const dv=deviceRef.current;
+    if(!dv.syncUrl||dv.role!=='main')return;
+    setSync({state:'sending',msg:''});
+    try{
+      await postJSON(dv.syncUrl,{action:'saveAll',data:dataRef.current,tables:buildSheetTables(dataRef.current),sentAt:nowISO()},dv.syncKey);
+      setDevice({pending:false,lastSent:nowISO()});setSync({state:'ok',msg:''});
+    }catch(e){setDevice({pending:true});setSync({state:'error',msg:e.message});}
+  }
+  async function pullNow(){
+    const dv=deviceRef.current;
+    if(!dv.syncUrl)return;
+    setSync({state:'pulling',msg:''});
+    try{
+      const j=await getJSON(dv.syncUrl,{action:'readAll'},dv.syncKey);
+      if(!j.data)throw new Error('Nothing saved in the sheet yet');
+      const d=migrate(j.data);saveData(d);setData(d);
+      setDevice({lastPulled:nowISO(),remoteSavedAt:j.savedAt||null});setSync({state:'ok',msg:''});
+    }catch(e){setSync({state:'error',msg:e.message});}
+  }
+  // Main phone: send after every change (short delay so quick edits go together)
+  useEffect(()=>{
+    if(firstRun.current){firstRun.current=false;return;}
+    const dv=deviceRef.current;
+    if(dv.role!=='main'||!dv.syncUrl)return;
+    setDevice({pending:true});
+    clearTimeout(timer.current);
+    timer.current=setTimeout(pushNow,2500);
+  },[data]);
+  // Retry when offline entries are waiting; viewer refreshes on open and every 2 minutes
+  useEffect(()=>{
+    if(!device.syncUrl)return;
+    if(device.role==='main'){
+      if(deviceRef.current.pending)pushNow();
+      const retry=()=>{if(deviceRef.current.pending)pushNow();};
+      window.addEventListener('online',retry);
+      const iv=setInterval(retry,60000);
+      return()=>{window.removeEventListener('online',retry);clearInterval(iv);};
+    }else{
+      pullNow();
+      const vis=()=>{if(document.visibilityState==='visible')pullNow();};
+      document.addEventListener('visibilitychange',vis);
+      const iv=setInterval(pullNow,120000);
+      return()=>{document.removeEventListener('visibilitychange',vis);clearInterval(iv);};
+    }
+  },[device.role,device.syncUrl]);
+  const ctx={data,update,canEdit:!isViewer,device,setDevice,sync,pushNow,pullNow,
+    openLog:(action,opts)=>setLog({action,...(opts||{})}),
+    jobDetail,openJob:id=>{setJobDetail(id);if(id)setTab('jobs');},
+    custDetail,openCustomer:id=>{setCustDetail(id);if(id)setTab('customers');},
+    morePage,goMorePage:id=>{setMorePage(id);if(id)setTab('more');}};
+  const tabs=[
+    {id:'home',icon:'🏠',label:'Home'},
+    {id:'jobs',icon:'☀️',label:'Jobs'},
+    {id:'customers',icon:'📇',label:'Customers'},
+    {id:'inventory',icon:'📦',label:'Inventory'},
+    {id:'more',icon:'☰',label:'More'},
+  ];
+  function navTo(id){setTab(id);setJobDetail(null);setCustDetail(null);setMorePage(null);}
+  return <AppCtx.Provider value={ctx}>
+    <div className="app-shell">
+      <div className="main">
+        {tab==='home'&&<HomeTab/>}
+        {tab==='jobs'&&<JobsTab/>}
+        {tab==='customers'&&<CustomersTab/>}
+        {tab==='inventory'&&<InventoryTab/>}
+        {tab==='more'&&<MoreTab/>}
+      </div>
+      <nav className="bottom-nav">
+        {tabs.map(t=><button key={t.id} className={`nav-item${tab===t.id?' active':''}`} onClick={()=>navTo(t.id)}>
+          <span className="nav-icon">{t.icon}</span><span>{t.label}</span>
+        </button>)}
+      </nav>
+      <LogModals log={log} onClose={()=>setLog(null)}/>
+    </div>
+  </AppCtx.Provider>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
